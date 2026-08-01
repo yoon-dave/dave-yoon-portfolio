@@ -337,8 +337,8 @@ export default function AmbientBackground() {
     window.addEventListener('mousemove', onMouseMove)
     window.addEventListener('mouseleave', onMouseLeave)
 
-    const pilot = { x: width / 2, y: height / 2, vx: 0, vy: 0 }
-    const pilotAngle = { current: -Math.PI / 2 }
+    const pilot = { x: width * 0.72, y: height * 0.62, vx: 0, vy: 0 }
+    const pilotAngle = { current: -0.6 }
     const pilotOrbit = { active: false, angle: Math.random() * Math.PI * 2 }
 
     let shootingStars: ShootingStar[] = []
