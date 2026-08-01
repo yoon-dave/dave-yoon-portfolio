@@ -59,9 +59,8 @@ const ASTEROID_COUNT = 5
 const LINK_DISTANCE = 140
 const GRAVITY_RADIUS = 200
 const GRAVITY_STRENGTH = 0.035
-const PILOT_THRUST = 340
-const PILOT_DRAG = 3
-const PILOT_MAX_SPEED = 130
+const PILOT_OMEGA = 5.5
+const PILOT_MAX_SPEED = 160
 const PILOT_ORBIT_RADIUS = 55
 const PILOT_ORBIT_ENTER = 70
 const PILOT_ORBIT_EXIT = 110
@@ -558,10 +557,9 @@ export default function AmbientBackground() {
           ctx.restore()
         }
 
-        // Companion pilot: seeks the cursor with thrust + drag, then orbits it
-        // once close instead of locking onto the exact point. Thrust scales with
-        // how aligned the current heading is with the target, so it accelerates
-        // when flying straight and eases off while turning. Skipped entirely on
+        // Companion pilot: a critically-damped spring follows the cursor (or a
+        // point orbiting it, once close), so it converges smoothly with no
+        // overshoot/oscillation by construction. Skipped entirely on
         // touch-only devices, which have no cursor for it to chase.
         if (hasFinePointer) {
         const hasTarget = mouse.x > -1000
@@ -578,22 +576,16 @@ export default function AmbientBackground() {
             targetY = mouse.y + Math.sin(pilotOrbit.angle) * PILOT_ORBIT_RADIUS
           }
 
-          const dx = targetX - pilot.x
-          const dy = targetY - pilot.y
-          const dist = Math.hypot(dx, dy) || 1
-          const dirX = dx / dist
-          const dirY = dy / dist
-
-          const speed = Math.hypot(pilot.vx, pilot.vy)
-          const alignment = speed > 1 ? (pilot.vx / speed) * dirX + (pilot.vy / speed) * dirY : 1
-          const thrustScale = 0.6 + 0.4 * ((alignment + 1) / 2)
-          pilot.vx += dirX * PILOT_THRUST * thrustScale * dt
-          pilot.vy += dirY * PILOT_THRUST * thrustScale * dt
+          const omegaSq = PILOT_OMEGA * PILOT_OMEGA
+          const ax = omegaSq * (targetX - pilot.x) - 2 * PILOT_OMEGA * pilot.vx
+          const ay = omegaSq * (targetY - pilot.y) - 2 * PILOT_OMEGA * pilot.vy
+          pilot.vx += ax * dt
+          pilot.vy += ay * dt
         } else {
           pilotOrbit.active = false
+          pilot.vx -= pilot.vx * 2 * dt
+          pilot.vy -= pilot.vy * 2 * dt
         }
-        pilot.vx -= pilot.vx * PILOT_DRAG * dt
-        pilot.vy -= pilot.vy * PILOT_DRAG * dt
         const pilotSpeed = Math.hypot(pilot.vx, pilot.vy)
         if (pilotSpeed > PILOT_MAX_SPEED) {
           pilot.vx = (pilot.vx / pilotSpeed) * PILOT_MAX_SPEED

@@ -9,7 +9,7 @@ export default function Hero() {
           00 / Hi, I'm
         </p>
         <h1
-          className="animate-hero-in mt-4 text-5xl font-semibold tracking-tight text-slate-900 sm:text-6xl dark:text-white"
+          className="name-gradient animate-hero-in mt-4 text-5xl font-semibold tracking-tight sm:text-6xl"
           style={{ animationDelay: '120ms' }}
         >
           Dave Yoon
