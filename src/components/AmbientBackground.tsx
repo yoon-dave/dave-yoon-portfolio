@@ -59,13 +59,13 @@ const ASTEROID_COUNT = 5
 const LINK_DISTANCE = 140
 const GRAVITY_RADIUS = 200
 const GRAVITY_STRENGTH = 0.035
-const PILOT_THRUST = 500
-const PILOT_DRAG = 2.4
+const PILOT_THRUST = 340
+const PILOT_DRAG = 3
 const PILOT_MAX_SPEED = 130
 const PILOT_ORBIT_RADIUS = 55
 const PILOT_ORBIT_ENTER = 70
 const PILOT_ORBIT_EXIT = 110
-const PILOT_ORBIT_ANGULAR_SPEED = 1.6
+const PILOT_ORBIT_ANGULAR_SPEED = 1.1
 
 const PALETTE: Record<StarColor, { dark: string; light: string }> = {
   indigo: { dark: '129, 140, 248', light: '99, 102, 241' },
@@ -80,6 +80,13 @@ function pickColor(): StarColor {
   if (roll < 0.65) return 'violet'
   if (roll < 0.85) return 'cyan'
   return 'amber'
+}
+
+function angleLerp(from: number, to: number, t: number) {
+  let diff = to - from
+  while (diff > Math.PI) diff -= Math.PI * 2
+  while (diff < -Math.PI) diff += Math.PI * 2
+  return from + diff * t
 }
 
 function drawAsteroidPath(ctx: CanvasRenderingContext2D, radius: number) {
@@ -579,16 +586,9 @@ export default function AmbientBackground() {
 
           const speed = Math.hypot(pilot.vx, pilot.vy)
           const alignment = speed > 1 ? (pilot.vx / speed) * dirX + (pilot.vy / speed) * dirY : 1
-          const thrustScale = 0.55 + 0.45 * Math.max(0, alignment)
+          const thrustScale = 0.6 + 0.4 * ((alignment + 1) / 2)
           pilot.vx += dirX * PILOT_THRUST * thrustScale * dt
           pilot.vy += dirY * PILOT_THRUST * thrustScale * dt
-
-          if (alignment < 0.4) {
-            const turnDrag = (0.4 - alignment) * 2.2
-            pilot.vx -= pilot.vx * turnDrag * dt
-            pilot.vy -= pilot.vy * turnDrag * dt
-          }
-
         } else {
           pilotOrbit.active = false
         }
@@ -602,7 +602,8 @@ export default function AmbientBackground() {
         pilot.x += pilot.vx * dt
         pilot.y += pilot.vy * dt
         if (pilotSpeed > 3) {
-          pilotAngle.current = Math.atan2(pilot.vy, pilot.vx)
+          const targetAngle = Math.atan2(pilot.vy, pilot.vx)
+          pilotAngle.current = angleLerp(pilotAngle.current, targetAngle, Math.min(1, dt * 8))
         }
 
         const pilotRgb = PALETTE.indigo[isDark ? 'dark' : 'light']
