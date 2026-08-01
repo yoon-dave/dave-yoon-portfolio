@@ -105,6 +105,7 @@ export default function AmbientBackground() {
     if (!canvas || !ctx) return
 
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const hasFinePointer = window.matchMedia('(pointer: fine)').matches
     const darkQuery = window.matchMedia('(prefers-color-scheme: dark)')
     let isDark = darkQuery.matches
 
@@ -553,7 +554,9 @@ export default function AmbientBackground() {
         // Companion pilot: seeks the cursor with thrust + drag, then orbits it
         // once close instead of locking onto the exact point. Thrust scales with
         // how aligned the current heading is with the target, so it accelerates
-        // when flying straight and eases off while turning.
+        // when flying straight and eases off while turning. Skipped entirely on
+        // touch-only devices, which have no cursor for it to chase.
+        if (hasFinePointer) {
         const hasTarget = mouse.x > -1000
         if (hasTarget) {
           const rawDist = Math.hypot(mouse.x - pilot.x, mouse.y - pilot.y)
@@ -586,9 +589,6 @@ export default function AmbientBackground() {
             pilot.vy -= pilot.vy * turnDrag * dt
           }
 
-          if (dist > 2) {
-            pilotAngle.current = Math.atan2(dy, dx)
-          }
         } else {
           pilotOrbit.active = false
         }
@@ -601,6 +601,9 @@ export default function AmbientBackground() {
         }
         pilot.x += pilot.vx * dt
         pilot.y += pilot.vy * dt
+        if (pilotSpeed > 3) {
+          pilotAngle.current = Math.atan2(pilot.vy, pilot.vx)
+        }
 
         const pilotRgb = PALETTE.indigo[isDark ? 'dark' : 'light']
         const pilotFlicker = 0.85 + 0.15 * Math.sin(time * 0.035)
@@ -649,6 +652,7 @@ export default function AmbientBackground() {
         ctx.fill()
 
         ctx.restore()
+        }
       }
 
       frame = requestAnimationFrame(draw)
