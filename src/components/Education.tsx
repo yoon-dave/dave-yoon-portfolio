@@ -25,7 +25,7 @@ function EducationCard({ entry, delay }: { entry: EducationEntry; delay: number 
       <p className="mt-1 text-sm text-slate-500 dark:text-slate-500">
         {entry.dates}
       </p>
-      <p className="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+      <p className="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
         Relevant coursework: {entry.coursework}
       </p>
     </div>

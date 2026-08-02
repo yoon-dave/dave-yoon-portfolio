@@ -54,17 +54,18 @@ interface Rocket {
 }
 
 const NODE_COUNT = 46
-const FAR_STAR_COUNT = 110
+const FAR_STAR_COUNT = 150
 const ASTEROID_COUNT = 5
 const LINK_DISTANCE = 140
 const GRAVITY_RADIUS = 200
 const GRAVITY_STRENGTH = 0.035
-const PILOT_OMEGA = 5.5
-const PILOT_MAX_SPEED = 160
+const PILOT_OMEGA = 3
+const PILOT_MAX_SPEED = 85
 const PILOT_ORBIT_RADIUS = 55
 const PILOT_ORBIT_ENTER = 70
 const PILOT_ORBIT_EXIT = 110
-const PILOT_ORBIT_ANGULAR_SPEED = 1.1
+const PILOT_ORBIT_ANGULAR_SPEED = 0.55
+const PLANET_SPIN_SPEED = 0.45
 
 const PALETTE: Record<StarColor, { dark: string; light: string }> = {
   indigo: { dark: '129, 140, 248', light: '99, 102, 241' },
@@ -112,8 +113,7 @@ export default function AmbientBackground() {
 
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     const hasFinePointer = window.matchMedia('(pointer: fine)').matches
-    const darkQuery = window.matchMedia('(prefers-color-scheme: dark)')
-    let isDark = darkQuery.matches
+    const isDark = true
 
     let width = window.innerWidth
     let height = window.innerHeight
@@ -161,8 +161,8 @@ export default function AmbientBackground() {
         cy,
         radius,
       )
-      bodyGradient.addColorStop(0, `rgba(${bodyRgb}, ${isDark ? 0.85 : 0.4})`)
-      bodyGradient.addColorStop(1, `rgba(${bodyRgb}, ${isDark ? 0.4 : 0.16})`)
+      bodyGradient.addColorStop(0, `rgba(${bodyRgb}, ${isDark ? 0.62 : 0.3})`)
+      bodyGradient.addColorStop(1, `rgba(${bodyRgb}, ${isDark ? 0.42 : 0.18})`)
       nebulaCtx.fillStyle = bodyGradient
       nebulaCtx.beginPath()
       nebulaCtx.arc(cx, cy, radius, 0, Math.PI * 2)
@@ -205,6 +205,7 @@ export default function AmbientBackground() {
       const cy = height * 0.85
       const radius = Math.min(width, height) * 0.055
       const rgb = isDark ? '103, 232, 249' : '34, 211, 238'
+
       const gradient = nebulaCtx.createRadialGradient(
         cx - radius * 0.3,
         cy - radius * 0.3,
@@ -213,12 +214,94 @@ export default function AmbientBackground() {
         cy,
         radius,
       )
-      gradient.addColorStop(0, `rgba(${rgb}, ${isDark ? 0.42 : 0.18})`)
-      gradient.addColorStop(1, `rgba(${rgb}, ${isDark ? 0.08 : 0.03})`)
+      gradient.addColorStop(0, `rgba(${rgb}, ${isDark ? 0.32 : 0.15})`)
+      gradient.addColorStop(1, `rgba(${rgb}, ${isDark ? 0.14 : 0.05})`)
       nebulaCtx.fillStyle = gradient
       nebulaCtx.beginPath()
       nebulaCtx.arc(cx, cy, radius, 0, Math.PI * 2)
       nebulaCtx.fill()
+    }
+
+    // Draws a few longitude lines that sweep across a sphere's face as it
+    // spins about an axis tilted slightly off vertical (like a real
+    // planet's axial tilt, rather than perfectly upright), fading out at
+    // the limb. Cheap enough to redraw every frame since it's just a
+    // handful of clipped arcs.
+    const drawSpinLines = (
+      cx: number,
+      cy: number,
+      radius: number,
+      time: number,
+      axialTilt: number,
+    ) => {
+      ctx.save()
+      ctx.beginPath()
+      ctx.arc(cx, cy, radius, 0, Math.PI * 2)
+      ctx.clip()
+      ctx.translate(cx, cy)
+      ctx.rotate(axialTilt)
+      const meridianCount = 3
+      for (let i = 0; i < meridianCount; i++) {
+        const phi = (time / 1000) * PLANET_SPIN_SPEED + (i * (Math.PI * 2)) / meridianCount
+        const cosPhi = Math.cos(phi)
+        if (cosPhi <= 0) continue
+        const a = Math.abs(radius * Math.sin(phi))
+        ctx.strokeStyle = `rgba(226, 232, 240, ${cosPhi * 0.32})`
+        ctx.lineWidth = 1
+        ctx.beginPath()
+        if (Math.sin(phi) >= 0) {
+          ctx.ellipse(0, 0, a, radius, 0, -Math.PI / 2, Math.PI / 2)
+        } else {
+          ctx.ellipse(0, 0, a, radius, 0, Math.PI / 2, (3 * Math.PI) / 2)
+        }
+        ctx.stroke()
+      }
+      ctx.restore()
+    }
+
+    // Rotating dash accent on the ring, synced to the same spin phase as
+    // the planet's longitude lines. Runs all the way around the ellipse so
+    // dashes don't pop out of existence at the front/back seam — the back
+    // half is clipped against the planet's disk instead, so dashes only
+    // fade where the ring geometrically passes behind the sphere, and stay
+    // visible on the "wings" that stick out past the disk on either side.
+    const drawRingSpin = (
+      cx: number,
+      cy: number,
+      radius: number,
+      tilt: number,
+      ringRx: number,
+      ringScaleY: number,
+      time: number,
+    ) => {
+      const dashOffset = -(time / 1000) * PLANET_SPIN_SPEED * ringRx
+      const drawHalf = (start: number, end: number, alpha: number, excludeDisk: boolean) => {
+        ctx.save()
+        if (excludeDisk) {
+          ctx.beginPath()
+          ctx.rect(cx - ringRx * 1.2, cy - ringRx * 1.2, ringRx * 2.4, ringRx * 2.4)
+          ctx.arc(cx, cy, radius, 0, Math.PI * 2)
+          ctx.clip('evenodd')
+        }
+        ctx.translate(cx, cy)
+        ctx.rotate(tilt)
+        ctx.scale(1, ringScaleY)
+        ctx.strokeStyle = `rgba(226, 232, 240, ${alpha})`
+        ctx.lineWidth = 3
+        ctx.setLineDash([5, 20])
+        // Each arc's dash pattern is measured from its own start angle, so
+        // without this the two halves fall out of phase at the seam. Offset
+        // by the arc length already "used up" getting to this start angle
+        // so both halves read as one continuous rotating pattern.
+        ctx.lineDashOffset = dashOffset + ringRx * start
+        ctx.beginPath()
+        ctx.arc(0, 0, ringRx, start, end)
+        ctx.stroke()
+        ctx.setLineDash([])
+        ctx.restore()
+      }
+      drawHalf(Math.PI, Math.PI * 2, 0.3, true)
+      drawHalf(0, Math.PI, 0.45, false)
     }
 
     const drawNebula = () => {
@@ -293,12 +376,6 @@ export default function AmbientBackground() {
       }))
     }
 
-    const onThemeChange = (event: MediaQueryListEvent) => {
-      isDark = event.matches
-      drawNebula()
-    }
-    darkQuery.addEventListener('change', onThemeChange)
-
     const resize = () => {
       width = window.innerWidth
       height = window.innerHeight
@@ -360,6 +437,19 @@ export default function AmbientBackground() {
 
       ctx.clearRect(0, 0, width, height)
       ctx.drawImage(nebulaCanvas, 0, 0, width, height)
+
+      if (!reduceMotion) {
+        const ringedCx = width * 0.88
+        const ringedCy = height * 0.1
+        const ringedRadius = Math.min(width, height) * 0.1
+        drawSpinLines(ringedCx, ringedCy, ringedRadius, time, 0.22)
+        drawRingSpin(ringedCx, ringedCy, ringedRadius, -0.35, ringedRadius * 1.7, 0.32, time)
+
+        const secondaryCx = width * 0.07
+        const secondaryCy = height * 0.85
+        const secondaryRadius = Math.min(width, height) * 0.055
+        drawSpinLines(secondaryCx, secondaryCy, secondaryRadius, time, -0.16)
+      }
 
       for (const star of farStars) {
         const twinkle = reduceMotion
@@ -658,7 +748,6 @@ export default function AmbientBackground() {
       window.removeEventListener('resize', resize)
       window.removeEventListener('mousemove', onMouseMove)
       window.removeEventListener('mouseleave', onMouseLeave)
-      darkQuery.removeEventListener('change', onThemeChange)
     }
   }, [])
 

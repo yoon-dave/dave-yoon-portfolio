@@ -27,7 +27,7 @@ export default function About() {
       <SectionHeading number="01" title="About" />
       <p
         ref={bio.ref}
-        className={`mt-6 max-w-2xl text-lg leading-relaxed text-slate-600 dark:text-slate-400 ${bio.className}`}
+        className={`mt-6 max-w-2xl text-lg leading-relaxed text-slate-600 dark:text-slate-300 ${bio.className}`}
         style={bio.style}
       >
         I'm a Computer Science student at the University of Washington with a

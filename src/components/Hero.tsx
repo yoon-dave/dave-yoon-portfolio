@@ -15,7 +15,7 @@ export default function Hero() {
           Dave Yoon
         </h1>
         <p
-          className="animate-hero-in mt-6 max-w-xl text-lg text-slate-600 dark:text-slate-400"
+          className="animate-hero-in mt-6 max-w-xl text-lg text-slate-600 dark:text-slate-300"
           style={{ animationDelay: '240ms' }}
         >
           I'm a CS student at the University of Washington who likes

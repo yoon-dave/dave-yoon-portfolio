@@ -10,7 +10,7 @@ import AmbientBackground from './components/AmbientBackground'
 
 function App() {
   return (
-    <div className="min-h-svh text-slate-700 dark:text-slate-300">
+    <div className="min-h-svh text-slate-700 dark:text-slate-200">
       <AmbientBackground />
       <ScrollProgress />
       <Nav />
