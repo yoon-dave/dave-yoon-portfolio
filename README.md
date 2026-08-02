@@ -1,32 +1,68 @@
-# React + TypeScript + Vite
+# Dave Yoon — Portfolio
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+My personal portfolio site: [dave-yoon-portfolio.vercel.app](https://dave-yoon-portfolio.vercel.app)
 
-Currently, two official plugins are available:
+A single-page React site with an animated space-themed background — twinkling
+stars, two slowly spinning planets, the occasional shooting star, and a small
+ship that follows the cursor — built with React, TypeScript, Vite, and
+Tailwind CSS, and deployed on Vercel.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Features
 
-## React Compiler
+- **Ambient canvas background** — a starfield with a connected-node effect
+  around the cursor, drifting asteroids, shooting stars, and two planets that
+  spin on a slightly tilted axis with a synced rotating ring accent, all
+  hand-rolled on `<canvas>` (`src/components/AmbientBackground.tsx`)
+- **Working contact form** — submissions POST to a Vercel serverless
+  function (`api/contact.ts`) that sends real email via
+  [Resend](https://resend.com), with copy-to-clipboard fallbacks on the
+  footer email/phone links
+- **Locked dark theme, scroll-aware nav, and reduced-motion support**
+  throughout
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Tech stack
 
-## Expanding the Oxlint configuration
+- [React 19](https://react.dev) + [TypeScript](https://www.typescriptlang.org)
+- [Vite](https://vitejs.dev) for dev/build tooling
+- [Tailwind CSS v4](https://tailwindcss.com)
+- [Resend](https://resend.com) for transactional email
+- [Vercel](https://vercel.com) for hosting and serverless functions
+- [oxlint](https://oxc.rs) for linting
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
+## Getting started
 
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```bash
+npm install
+npm run dev
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+The contact form's `/api/contact` route only runs under Vercel's dev server
+(plain `vite dev` serves the frontend only), so to exercise it locally:
+
+```bash
+npm i -g vercel
+vercel dev
+```
+
+You'll need a `RESEND_API_KEY` environment variable — pull it from the linked
+Vercel project with `vercel env pull`, or set your own in `.env.local`.
+
+## Scripts
+
+| Command           | Description                          |
+| ------------------ | ------------------------------------- |
+| `npm run dev`       | Start the Vite dev server             |
+| `npm run build`     | Type-check and build for production   |
+| `npm run preview`   | Preview the production build locally  |
+| `npm run lint`      | Run oxlint                            |
+
+## Project structure
+
+```
+src/
+  components/   UI sections (Hero, About, Education, Projects, Contact, Nav, ...)
+  data/         Static content for Education and Projects sections
+  hooks/        Small shared hooks (scroll-reveal animation)
+api/
+  contact.ts    Serverless function that sends contact-form emails via Resend
+```
