@@ -9,13 +9,11 @@ import Contact from './components/Contact'
 import ScrollProgress from './components/ScrollProgress'
 import ScrollToTop from './components/ScrollToTop'
 import TitleBlock from './components/TitleBlock'
-import GlobalGrid from './components/GlobalGrid'
 
 function App() {
   return (
     <MotionConfig reducedMotion="user">
       <div className="relative min-h-svh bg-ink-950 text-paper">
-        <GlobalGrid />
         <ScrollProgress />
         <Nav />
         <main className="relative z-10">

@@ -4,18 +4,21 @@ import { motion, useReducedMotion } from 'motion/react'
 // Hand-authored scatter for each letterform — not randomized, so the
 // assembly reads as designed (like cut letters being placed on a page)
 // rather than physics-random. x/y in px, r in degrees, delay in seconds.
+// Each letter also starts oversized, so the name reads as materializing
+// from illegible, too-large fragments rather than just sliding into
+// place — an unusual scale relationship, not just a position tween.
 const LINE_ONE = [
-  { char: 'D', x: -64, y: -46, r: -16, delay: 0.02 },
-  { char: 'A', x: 52, y: -60, r: 13, delay: 0.16 },
-  { char: 'V', x: -38, y: 54, r: 20, delay: 0.09 },
-  { char: 'E', x: 70, y: 34, r: -11, delay: 0.24 },
+  { char: 'D', x: -64, y: -46, r: -16, scale: 2.4, delay: 0.02 },
+  { char: 'A', x: 52, y: -60, r: 13, scale: 2.1, delay: 0.16 },
+  { char: 'V', x: -38, y: 54, r: 20, scale: 2.6, delay: 0.09 },
+  { char: 'E', x: 70, y: 34, r: -11, scale: 1.9, delay: 0.24 },
 ]
 
 const LINE_TWO = [
-  { char: 'Y', x: -80, y: 22, r: 15, delay: 0.32 },
-  { char: 'O', x: 56, y: -36, r: -18, delay: 0.44 },
-  { char: 'O', x: -28, y: 62, r: 9, delay: 0.38 },
-  { char: 'N', x: 84, y: -18, r: -13, delay: 0.52 },
+  { char: 'Y', x: -80, y: 22, r: 15, scale: 2.3, delay: 0.32 },
+  { char: 'O', x: 56, y: -36, r: -18, scale: 2, delay: 0.44 },
+  { char: 'O', x: -28, y: 62, r: 9, scale: 2.5, delay: 0.38 },
+  { char: 'N', x: 84, y: -18, r: -13, scale: 2.2, delay: 0.52 },
 ]
 
 function Letterline({
@@ -31,12 +34,14 @@ function Letterline({
         <motion.span
           key={`${l.char}-${i}`}
           className="inline-block"
-          initial={prefersReducedMotion ? undefined : { x: l.x, y: l.y, rotate: l.r, opacity: 0 }}
-          animate={{ x: 0, y: 0, rotate: 0, opacity: 1 }}
+          initial={
+            prefersReducedMotion ? undefined : { x: l.x, y: l.y, rotate: l.r, scale: l.scale, opacity: 0 }
+          }
+          animate={{ x: 0, y: 0, rotate: 0, scale: 1, opacity: 1 }}
           transition={
             prefersReducedMotion
               ? { duration: 0 }
-              : { type: 'spring', stiffness: 130, damping: 13, mass: 0.9, delay: l.delay }
+              : { type: 'spring', stiffness: 110, damping: 14, mass: 1, delay: l.delay }
           }
         >
           {l.char}

@@ -3,6 +3,7 @@ import { motion, useScroll, useSpring, useTransform, useReducedMotion } from 'mo
 import { projects } from '../data/projects'
 import { experience } from '../data/experience'
 import Tag from './Tag'
+import CircleReveal from './CircleReveal'
 import CodelensArtifact from './projects/CodelensArtifact'
 import GymBudArtifact from './projects/GymBudArtifact'
 import AlgoverseArtifact from './projects/AlgoverseArtifact'
@@ -56,6 +57,7 @@ function ExhibitItem({
   link,
   linkLabel,
   delay,
+  oversized,
 }: {
   className: string
   artifact: ReactNode
@@ -67,6 +69,7 @@ function ExhibitItem({
   link?: string
   linkLabel?: string
   delay: number
+  oversized?: boolean
 }) {
   const prefersReducedMotion = useReducedMotion()
 
@@ -81,7 +84,13 @@ function ExhibitItem({
       <div className="flex justify-center sm:justify-start">{artifact}</div>
       <div>
         <span className="eyebrow">{eyebrow}</span>
-        <h3 className="mt-2 font-display text-2xl font-bold uppercase tracking-tight text-paper sm:text-3xl">
+        <h3
+          className={
+            oversized
+              ? 'mt-2 font-display text-5xl leading-[0.95] font-bold uppercase tracking-tight text-paper sm:text-7xl'
+              : 'mt-2 font-display text-2xl font-bold uppercase tracking-tight text-paper sm:text-3xl'
+          }
+        >
           {title}
         </h3>
         <p className="mt-3 max-w-md text-sm leading-relaxed text-paper-dim">{description}</p>
@@ -122,15 +131,16 @@ export default function Projects() {
     >
       <GridLines target={sectionRef} />
 
-      <div className="relative flex items-center gap-3">
-        <span aria-hidden="true" className="h-1.5 w-1.5 bg-accent" />
-        <span className="eyebrow">Exhibit</span>
-      </div>
-      <h2 className="relative mt-2 font-display text-5xl font-bold uppercase tracking-tight text-paper sm:text-6xl">
-        Selected work
-      </h2>
+      <CircleReveal>
+        <div className="relative flex items-center gap-3">
+          <span aria-hidden="true" className="h-1.5 w-1.5 bg-accent" />
+          <span className="eyebrow">Exhibit</span>
+        </div>
+        <h2 className="relative mt-2 font-display text-5xl font-bold uppercase tracking-tight text-paper sm:text-6xl">
+          Selected work
+        </h2>
 
-      <div className="relative mt-20 grid grid-cols-1 gap-x-8 gap-y-24 lg:grid-cols-12 lg:gap-y-16">
+        <div className="relative mt-20 grid grid-cols-1 gap-x-8 gap-y-24 lg:grid-cols-12 lg:gap-y-16">
         <ExhibitItem
           className="lg:col-span-7 lg:col-start-1"
           artifact={<CodelensArtifact />}
@@ -142,6 +152,7 @@ export default function Projects() {
           link={codelens.link}
           linkLabel="Live site"
           delay={0}
+          oversized
         />
         <ExhibitItem
           className="lg:col-span-4 lg:col-start-9 lg:mt-20"
@@ -155,7 +166,7 @@ export default function Projects() {
           delay={0.08}
         />
         <ExhibitItem
-          className="lg:col-span-8 lg:col-start-2 lg:mt-8"
+          className="lg:col-span-7 lg:col-start-2 lg:mt-8"
           artifact={<AlgoverseArtifact />}
           eyebrow={algoverse.code}
           title={algoverse.company}
@@ -166,7 +177,7 @@ export default function Projects() {
           delay={0.12}
         />
         <ExhibitItem
-          className="lg:col-span-4 lg:col-start-9 lg:mt-4"
+          className="lg:col-span-4 lg:col-start-9 lg:mt-24"
           artifact={<DubHacksArtifact />}
           eyebrow={dubhacks.code}
           title={dubhacks.title}
@@ -175,11 +186,12 @@ export default function Projects() {
           statText="3rd Place"
           delay={0.2}
         />
-      </div>
+        </div>
 
-      <p className="relative mt-24 font-mono text-xs text-paper-dim/60">
-        This site — React · TypeScript · Vite · Tailwind CSS · Resend
-      </p>
+        <p className="relative mt-24 font-mono text-xs text-paper-dim/60">
+          This site — React · TypeScript · Vite · Tailwind CSS · Resend
+        </p>
+      </CircleReveal>
     </section>
   )
 }

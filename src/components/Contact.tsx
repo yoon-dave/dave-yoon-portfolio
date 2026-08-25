@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import Eyebrow from './Eyebrow'
-import MaskReveal from './MaskReveal'
+import CircleReveal from './CircleReveal'
 
 const CONTACT_EMAIL = 'dgyoon@cs.washington.edu'
 const CONTACT_PHONE = '(425) 365-2019'
@@ -68,12 +68,12 @@ export default function Contact() {
   return (
     <section id="contact" className="relative mx-auto max-w-6xl px-6 py-28 sm:px-8 lg:px-12">
       <Eyebrow>Reach</Eyebrow>
-      <MaskReveal className="mt-6 max-w-2xl">
+      <CircleReveal className="mt-6 max-w-2xl">
         <p className="font-display text-3xl leading-[1.2] font-bold text-paper sm:text-4xl">
           Based in Sammamish, WA. Have a project in mind or just want to
           say hi?
         </p>
-      </MaskReveal>
+      </CircleReveal>
       <p className="mt-4 max-w-md text-base leading-relaxed text-paper-dim">
         Fill out the form and it'll land straight in my inbox.
       </p>

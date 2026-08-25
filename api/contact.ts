@@ -34,7 +34,7 @@ export default async function handler(req: ContactRequest, res: ServerResponse) 
   const resend = new Resend(process.env.RESEND_API_KEY)
 
   try {
-    const { error } = await resend.emails.send({
+    const { data, error } = await resend.emails.send({
       from: FROM_EMAIL,
       to: TO_EMAIL,
       replyTo: email,
@@ -49,6 +49,7 @@ export default async function handler(req: ContactRequest, res: ServerResponse) 
       return
     }
 
+    console.log('Contact email queued', data?.id)
     res.statusCode = 200
     res.setHeader('Content-Type', 'application/json')
     res.end(JSON.stringify({ ok: true }))
