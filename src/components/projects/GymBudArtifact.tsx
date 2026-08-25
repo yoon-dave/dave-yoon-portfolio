@@ -13,7 +13,7 @@ const DAYS = [
 
 export default function GymBudArtifact() {
   return (
-    <div className="artifact-frame w-full max-w-[15rem] rotate-[1.4deg] border border-ink-700 bg-ink-900 p-5 shadow-[6px_6px_0_0_var(--color-ink-800)]">
+    <div className="artifact-frame w-full max-w-[15rem] border border-ink-700 bg-ink-900 p-5 shadow-[6px_6px_0_0_var(--color-ink-800)]">
       <span className="font-mono text-[0.625rem] tracking-[0.14em] text-paper-dim uppercase">
         Illustrative · weekly consistency
       </span>

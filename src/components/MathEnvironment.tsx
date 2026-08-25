@@ -107,6 +107,13 @@ const STEP_POINTS = [0, 1, 2, 3, 4].map((i) => {
 })
 const STEP_PATH = STEP_POINTS.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ')
 
+// Real accuracy at a point on the primary curve — the same sigmoid value
+// that positions the dot vertically, rescaled to the paper's actual
+// 81% -> 91% range rather than a second, independent number.
+function accuracyAt(xNorm: number) {
+  return 81 + sigmoid(xNorm, STEEPNESS, MIDPOINT) * 10
+}
+
 function StaticMarker({ xNorm }: { xNorm: number }) {
   const { x, y } = curvePoint(xNorm, CURVE_TOP, CURVE_BOTTOM, STEEPNESS, MIDPOINT)
   const { y: y2 } = curvePoint(xNorm, CURVE2_TOP, CURVE2_BOTTOM, STEEPNESS_2, MIDPOINT_2)
@@ -117,6 +124,39 @@ function StaticMarker({ xNorm }: { xNorm: number }) {
       <circle cx={x} cy={y} r={5} fill="var(--color-accent)" opacity={0.9} />
       <circle cx={x} cy={y2} r={3} fill="var(--color-paper-dim)" opacity={0.55} />
     </>
+  )
+}
+
+// A Desmos-style coordinate readout for the scan point, rendered as HTML
+// (not SVG text) so it never inherits the curve's non-uniform stretch
+// from preserveAspectRatio="none" — plain text stays crisp at any aspect
+// ratio. Position and values are both driven by the same xNorm, so the
+// label always matches exactly where the dot sits.
+function StaticAnnotation({ xNorm }: { xNorm: number }) {
+  const { x, y } = curvePoint(xNorm, CURVE_TOP, CURVE_BOTTOM, STEEPNESS, MIDPOINT)
+  return (
+    <div
+      className="absolute font-mono text-[0.625rem] whitespace-nowrap text-paper-dim tabular"
+      style={{ left: `${(x / VIEW_W) * 100}%`, top: `${(y / VIEW_H) * 100}%`, transform: 'translate(10px, -16px)' }}
+    >
+      ({xNorm.toFixed(2)}, <span className="text-accent">{accuracyAt(xNorm).toFixed(0)}%</span>)
+    </div>
+  )
+}
+
+function TrackedAnnotation({ smoothX }: { smoothX: ReturnType<typeof useSpring> }) {
+  const left = useTransform(smoothX, (t) => `${(curvePoint(t, CURVE_TOP, CURVE_BOTTOM, STEEPNESS, MIDPOINT).x / VIEW_W) * 100}%`)
+  const top = useTransform(smoothX, (t) => `${(curvePoint(t, CURVE_TOP, CURVE_BOTTOM, STEEPNESS, MIDPOINT).y / VIEW_H) * 100}%`)
+  const xLabel = useTransform(smoothX, (t) => t.toFixed(2))
+  const accLabel = useTransform(smoothX, (t) => `${accuracyAt(t).toFixed(0)}%`)
+
+  return (
+    <motion.div
+      className="absolute font-mono text-[0.625rem] whitespace-nowrap text-paper-dim tabular"
+      style={{ left, top, x: 10, y: -16 }}
+    >
+      (<motion.span>{xLabel}</motion.span>, <motion.span className="text-accent">{accLabel}</motion.span>)
+    </motion.div>
   )
 }
 
@@ -190,6 +230,11 @@ export default function MathEnvironment({
 
         {!prefersReducedMotion && active ? <TrackedMarkers smoothX={smoothX} /> : <StaticMarker xNorm={0.5} />}
       </svg>
+      {!prefersReducedMotion && active ? (
+        <TrackedAnnotation smoothX={smoothX} />
+      ) : (
+        <StaticAnnotation xNorm={0.5} />
+      )}
     </div>
   )
 }

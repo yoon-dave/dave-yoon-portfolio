@@ -4,7 +4,7 @@
 // can replace this component's contents later without touching Projects.tsx.
 export default function CodelensArtifact() {
   return (
-    <div className="artifact-frame w-full max-w-sm -rotate-[1.1deg] border border-ink-700 bg-ink-900 p-5 shadow-[6px_6px_0_0_var(--color-ink-800)]">
+    <div className="artifact-frame w-full max-w-sm border border-ink-700 bg-ink-900 p-5 shadow-[6px_6px_0_0_var(--color-ink-800)]">
       <div className="flex items-center justify-between border-b border-ink-800 pb-3">
         <span className="font-mono text-[0.625rem] tracking-[0.14em] text-paper-dim uppercase">
           Sample finding · output structure

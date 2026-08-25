@@ -10,7 +10,7 @@ const STAGES = [
 
 export default function DubHacksArtifact() {
   return (
-    <div className="artifact-frame w-full max-w-md -rotate-[0.6deg] border border-ink-700 bg-ink-900 p-5 shadow-[6px_6px_0_0_var(--color-ink-800)]">
+    <div className="artifact-frame w-full max-w-md border border-ink-700 bg-ink-900 p-5 shadow-[6px_6px_0_0_var(--color-ink-800)]">
       <span className="font-mono text-[0.625rem] tracking-[0.14em] text-paper-dim uppercase">
         System diagram · T-Mobile 5G Home Internet gateway
       </span>
