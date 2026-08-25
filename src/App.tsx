@@ -9,6 +9,7 @@ import Contact from './components/Contact'
 import ScrollProgress from './components/ScrollProgress'
 import ScrollToTop from './components/ScrollToTop'
 import TitleBlock from './components/TitleBlock'
+import NextSection from './components/NextSection'
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
         </main>
         <TitleBlock />
         <ScrollToTop />
+        <NextSection />
       </div>
     </MotionConfig>
   )

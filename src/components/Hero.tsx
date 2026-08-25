@@ -75,16 +75,30 @@ export default function Hero() {
   const tiltX = cursor ? (cursor.y / (sectionRef.current?.offsetHeight || 800) - 0.5) * -3 : 0
   const tiltY = cursor ? (cursor.x / (sectionRef.current?.offsetWidth || 1200) - 0.5) * 3 : 0
 
+  // The specimen plate sits on a shallower plane than the name — half the
+  // tilt amplitude — so the two read as genuinely separated in depth
+  // rather than moving as one rigid unit.
+  const plateTiltX = tiltX * 0.4
+  const plateTiltY = tiltY * 0.4
+
   return (
     <section
       ref={sectionRef}
       id="home"
       onMouseMove={handleMouseMove}
       onMouseLeave={() => setCursor(null)}
-      className="relative mx-auto flex min-h-[92svh] w-full max-w-6xl flex-col justify-center px-6 py-28 sm:px-8 lg:px-12"
+      className="relative mx-auto flex min-h-[92svh] w-full max-w-6xl flex-col justify-center overflow-hidden px-6 py-28 sm:px-8 lg:px-12"
     >
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute -top-24 right-0 hidden select-none font-display text-[42rem] leading-none font-extrabold text-transparent lg:block"
+        style={{ WebkitTextStroke: '1px var(--color-ink-700)' }}
+      >
+        D
+      </span>
+
       <motion.div
-        className="w-fit"
+        className="relative w-fit"
         animate={{ rotateX: tiltX, rotateY: tiltY }}
         transition={{ type: 'spring', stiffness: 150, damping: 20 }}
         style={{ transformPerspective: 900 }}
@@ -95,7 +109,34 @@ export default function Hero() {
         </h1>
       </motion.div>
 
-      <div className="animate-hero-in mt-7 flex items-center gap-3" style={{ animationDelay: '620ms' }}>
+      <div className="absolute top-1/2 right-6 hidden w-52 -translate-y-1/2 lg:block xl:right-12">
+        <motion.div
+          className="border border-ink-800 bg-ink-950/60 p-4 backdrop-blur-[2px]"
+          style={{ transformPerspective: 900 }}
+          initial={prefersReducedMotion ? undefined : { opacity: 0, y: 14 }}
+          animate={{ opacity: 1, y: 0, rotateX: plateTiltX, rotateY: plateTiltY }}
+          transition={
+            prefersReducedMotion
+              ? { rotateX: { type: 'spring', stiffness: 150, damping: 20 }, default: { duration: 0 } }
+              : {
+                  opacity: { duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: 0.56 },
+                  y: { duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: 0.56 },
+                  rotateX: { type: 'spring', stiffness: 150, damping: 20 },
+                  rotateY: { type: 'spring', stiffness: 150, damping: 20 },
+                }
+          }
+        >
+          <span className="font-mono text-[0.625rem] tracking-[0.14em] text-paper-dim/70 uppercase">No. 01</span>
+          <div className="mt-2 flex items-start gap-2">
+            <span aria-hidden="true" className="mt-1 h-1.5 w-1.5 shrink-0 bg-accent" />
+            <p className="font-mono text-[0.6875rem] leading-relaxed tracking-wide text-paper-dim uppercase">
+              Computer Science — University of Washington
+            </p>
+          </div>
+        </motion.div>
+      </div>
+
+      <div className="animate-hero-in mt-7 flex items-center gap-3 lg:hidden" style={{ animationDelay: '620ms' }}>
         <span aria-hidden="true" className="h-1.5 w-1.5 bg-accent" />
         <span className="font-mono text-[0.6875rem] tracking-[0.16em] text-paper-dim uppercase">
           Computer Science — University of Washington
