@@ -9,7 +9,7 @@ import { motion, useScroll, useSpring, useTransform, useReducedMotion } from 'mo
 export default function CircleReveal({ children, className = '' }: { children: ReactNode; className?: string }) {
   const ref = useRef<HTMLDivElement>(null)
   const prefersReducedMotion = useReducedMotion()
-  const { scrollYProgress } = useScroll({ target: ref, offset: ['start 0.85', 'start 0.3'] })
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start 0.95', 'start 0.5'] })
   const smoothProgress = useSpring(scrollYProgress, { stiffness: 220, damping: 36, restDelta: 0.001 })
   const clipPath = useTransform(smoothProgress, (v) => `circle(${v * 142}% at 1.5% 3%)`)
 

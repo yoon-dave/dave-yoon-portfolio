@@ -8,7 +8,7 @@ import { motion, useScroll, useSpring, useTransform, useReducedMotion } from 'mo
 export default function MaskReveal({ children, className = '' }: { children: ReactNode; className?: string }) {
   const ref = useRef<HTMLDivElement>(null)
   const prefersReducedMotion = useReducedMotion()
-  const { scrollYProgress } = useScroll({ target: ref, offset: ['start 0.92', 'start 0.5'] })
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start 1', 'start 0.65'] })
   const smoothProgress = useSpring(scrollYProgress, { stiffness: 260, damping: 38, restDelta: 0.001 })
   const clipPath = useTransform(smoothProgress, (v) => `inset(0 ${100 - v * 100}% 0 0)`)
 
