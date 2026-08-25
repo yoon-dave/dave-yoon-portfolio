@@ -1,218 +1,185 @@
-import { useEffect, useRef, useState, type RefObject } from 'react'
-import {
-  motion,
-  useScroll,
-  useSpring,
-  useTransform,
-  useReducedMotion,
-  useInView,
-  useMotionValue,
-  animate,
-  type MotionValue,
-} from 'motion/react'
-import { projects, type Project } from '../data/projects'
-import SectionHeading from './SectionHeading'
+import { useRef, type ReactNode, type RefObject } from 'react'
+import { motion, useScroll, useSpring, useTransform, useReducedMotion } from 'motion/react'
+import { projects } from '../data/projects'
+import { experience } from '../data/experience'
 import Tag from './Tag'
+import CodelensArtifact from './projects/CodelensArtifact'
+import GymBudArtifact from './projects/GymBudArtifact'
+import AlgoverseArtifact from './projects/AlgoverseArtifact'
+import DubHacksArtifact from './projects/DubHacksArtifact'
 
-// Renders a numeric stat that counts up from zero the first time it scrolls
-// into view — the same "measured result" idea as the site's other stats,
-// but felt rather than just read.
-function CountUpStat({ value, suffix }: { value: number; suffix: string }) {
+const codelens = projects.find((p) => p.title === 'Codelens')!
+const gymbud = projects.find((p) => p.title === 'GymBud')!
+const dubhacks = projects.find((p) => p.title === 'T-Mobile AI Pricing Assistant')!
+const algoverse = experience.find((e) => e.company === 'Algoverse AI Research')!
+
+// Four vertical guide lines, quiet at rest, that resolve into focus as the
+// exhibit scrolls into view — the strongest transition on the page, built
+// as a continuous system rather than a fade. Scoped to this section only.
+function GridLines({ target }: { target: RefObject<HTMLElement | null> }) {
   const prefersReducedMotion = useReducedMotion()
-  const ref = useRef<HTMLParagraphElement>(null)
-  const inView = useInView(ref, { once: true, margin: '-80px' })
-  const count = useMotionValue(0)
-  const [display, setDisplay] = useState(0)
-
-  useEffect(() => {
-    const unsubscribe = count.on('change', (v) => setDisplay(Math.round(v)))
-    return unsubscribe
-  }, [count])
-
-  useEffect(() => {
-    if (!inView) return
-    if (prefersReducedMotion) {
-      count.set(value)
-      return
-    }
-    const controls = animate(count, value, { duration: 1.3, ease: [0.16, 1, 0.3, 1] })
-    return () => controls.stop()
-  }, [inView, prefersReducedMotion, value, count])
-
-  return (
-    <p ref={ref} className="mt-2 font-display text-4xl font-bold tabular text-accent">
-      {display}
-      {suffix}
-    </p>
-  )
-}
-
-// Title reveal, driven by a MotionValue rather than a nested declarative
-// whileInView (which never reliably fired when its motion.article ancestor
-// also carried its own whileInView and a scroll-linked scale transform).
-// The trigger reuses the row's own ref rather than a ref of its own: a ref
-// shared between useInView and a styled motion component's `ref` prop never
-// resolved, apparently because Motion's internal ref handling on the styled
-// element prevented useInView's effect from ever seeing a populated
-// ref.current. The row's ref, read here only (never assigned to a styled
-// motion node), doesn't have that conflict.
-function ProjectTitle({
-  title,
-  hasLink,
-  clipPath,
-}: {
-  title: string
-  hasLink: boolean
-  clipPath: MotionValue<string>
-}) {
-  return (
-    <motion.h3
-      style={{ clipPath }}
-      className="inline-flex items-center gap-3 font-display text-4xl font-bold uppercase tracking-tight text-paper transition-colors duration-300 group-hover:text-accent sm:text-5xl"
-    >
-      {title}
-      {hasLink && (
-        <span
-          aria-hidden="true"
-          className="text-2xl text-accent opacity-0 transition-all duration-300 ease-out group-hover:translate-x-1 group-hover:opacity-100 sm:text-3xl"
-        >
-          →
-        </span>
-      )}
-    </motion.h3>
-  )
-}
-
-function ProjectRow({ project, delay }: { project: Project; delay: number }) {
-  const rowRef = useRef<HTMLElement>(null)
-  const hasLink = Boolean(project.link || project.repo)
-  const prefersReducedMotion = useReducedMotion()
-  const rowInView = useInView(rowRef, { once: true, margin: '-80px' })
-  const titleProgress = useMotionValue(0)
-  const titleClipPath = useTransform(titleProgress, (v) => `inset(0% ${100 - v * 100}% 0% 0%)`)
-
-  useEffect(() => {
-    if (!rowInView) return
-    if (prefersReducedMotion) {
-      titleProgress.set(1)
-      return
-    }
-    const controls = animate(titleProgress, 1, { type: 'spring', stiffness: 60, damping: 18, delay: delay / 1000 })
-    return () => controls.stop()
-  }, [rowInView, prefersReducedMotion, delay, titleProgress])
-
-  // A subtle "in focus" weight as each row passes through the middle of the
-  // viewport — nowhere near a full dim/undim, just enough that the row
-  // you're actually reading feels a hair more present than its neighbors.
-  const { scrollYProgress } = useScroll({ target: rowRef, offset: ['start end', 'end start'] })
-  const smoothProgress = useSpring(scrollYProgress, { stiffness: 300, damping: 40, restDelta: 0.001 })
-  const focusScale = useTransform(smoothProgress, [0, 0.5, 1], [0.98, 1, 0.98])
-
-  return (
-    <motion.article
-      ref={rowRef}
-      className="group relative grid grid-cols-1 gap-6 border-t border-ink-800 py-12 transition-colors duration-300 ease-out hover:bg-white/5 sm:grid-cols-[220px_1fr] sm:gap-10"
-      initial={prefersReducedMotion ? undefined : { opacity: 0, y: 28 }}
-      whileInView={prefersReducedMotion ? undefined : { opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-80px' }}
-      transition={{ duration: 0.7, delay: delay / 1000, ease: [0.16, 1, 0.3, 1] }}
-      style={prefersReducedMotion ? undefined : { scale: focusScale }}
-    >
-      <span
-        aria-hidden="true"
-        className="absolute inset-y-0 left-0 w-0.5 origin-top scale-y-0 bg-accent transition-transform duration-300 ease-out group-hover:scale-y-100"
-      />
-
-      <div className="flex flex-col gap-5">
-        <div>
-          <span className="eyebrow">{project.code}</span>
-          {project.statNumber !== undefined ? (
-            <CountUpStat value={project.statNumber} suffix={project.statSuffix ?? ''} />
-          ) : (
-            project.stat && <p className="mt-2 font-display text-4xl font-bold tabular text-accent">{project.stat}</p>
-          )}
-        </div>
-        <ul className="flex flex-col gap-2 sm:mt-1">
-          {project.tags.map((tag, index) => (
-            <Tag key={tag} label={tag} delay={delay + index * 30} />
-          ))}
-        </ul>
-      </div>
-
-      <div className="flex flex-col">
-        <ProjectTitle title={project.title} hasLink={hasLink} clipPath={titleClipPath} />
-        <p className="mt-4 max-w-2xl text-sm leading-relaxed text-paper-dim">{project.description}</p>
-        {hasLink && (
-          <div className="mt-5 flex gap-6 font-mono text-xs tracking-wide uppercase">
-            {project.link && (
-              <a
-                href={project.link}
-                target="_blank"
-                rel="noreferrer"
-                className="link-underline inline-flex items-center gap-1.5 font-medium text-accent transition-colors hover:text-paper"
-              >
-                {project.linkLabel ?? 'Live site'}
-                <span aria-hidden="true" className="text-[0.6875rem]">
-                  ↗
-                </span>
-              </a>
-            )}
-            {project.repo && (
-              <a
-                href={project.repo}
-                target="_blank"
-                rel="noreferrer"
-                className="link-underline inline-flex items-center gap-1.5 text-paper-dim transition-colors hover:text-accent"
-              >
-                Source
-                <span aria-hidden="true" className="text-[0.6875rem]">
-                  ↗
-                </span>
-              </a>
-            )}
-          </div>
-        )}
-      </div>
-    </motion.article>
-  )
-}
-
-// The section's ink-900 band, given motion: closed to a thin central slit
-// while Projects is offscreen, opening like a drafting sheet unfolding as it
-// scrolls into view, held open through the reading portion, then closing
-// again on the way out. One continuous scroll-linked value covers both the
-// Experience -> Projects arrival and the Projects -> Contact departure.
-function ProjectsPanel({ target }: { target: RefObject<HTMLElement | null> }) {
-  const prefersReducedMotion = useReducedMotion()
-  const { scrollYProgress } = useScroll({ target, offset: ['start end', 'end start'] })
-  const smoothProgress = useSpring(scrollYProgress, { stiffness: 260, damping: 36, restDelta: 0.001 })
-  const clipPath = useTransform(
-    smoothProgress,
-    [0, 0.18, 0.82, 1],
-    ['inset(46% 40% 46% 40%)', 'inset(0% 0% 0% 0%)', 'inset(0% 0% 0% 0%)', 'inset(46% 40% 46% 40%)'],
-  )
+  const { scrollYProgress } = useScroll({ target, offset: ['start end', 'start 30%'] })
+  const smoothProgress = useSpring(scrollYProgress, { stiffness: 200, damping: 34, restDelta: 0.001 })
+  const opacity = useTransform(smoothProgress, [0, 1], [0, 1])
 
   if (prefersReducedMotion) {
-    return <div className="absolute inset-0 bg-ink-900" aria-hidden="true" />
+    return (
+      <div className="pointer-events-none absolute inset-0 hidden lg:grid lg:grid-cols-12" aria-hidden="true">
+        {[1, 4, 8, 12].map((col) => (
+          <span key={col} className="border-l border-ink-800" style={{ gridColumn: col }} />
+        ))}
+      </div>
+    )
   }
 
-  return <motion.div className="absolute inset-0 bg-ink-900" style={{ clipPath }} aria-hidden="true" />
+  return (
+    <motion.div
+      className="pointer-events-none absolute inset-0 hidden lg:grid lg:grid-cols-12"
+      style={{ opacity }}
+      aria-hidden="true"
+    >
+      {[1, 4, 8, 12].map((col) => (
+        <span key={col} className="border-l border-ink-800" style={{ gridColumn: col }} />
+      ))}
+    </motion.div>
+  )
+}
+
+function ExhibitItem({
+  className,
+  artifact,
+  eyebrow,
+  title,
+  description,
+  tags,
+  statText,
+  link,
+  linkLabel,
+  delay,
+}: {
+  className: string
+  artifact: ReactNode
+  eyebrow: string
+  title: string
+  description: string
+  tags: string[]
+  statText?: string
+  link?: string
+  linkLabel?: string
+  delay: number
+}) {
+  const prefersReducedMotion = useReducedMotion()
+
+  return (
+    <motion.div
+      className={`relative flex flex-col gap-6 ${className}`}
+      initial={prefersReducedMotion ? undefined : { opacity: 0, y: 40, rotate: -0.6 }}
+      whileInView={prefersReducedMotion ? undefined : { opacity: 1, y: 0, rotate: 0 }}
+      viewport={{ once: true, margin: '-100px' }}
+      transition={{ type: 'spring', stiffness: 120, damping: 17, delay }}
+    >
+      <div className="flex justify-center sm:justify-start">{artifact}</div>
+      <div>
+        <span className="eyebrow">{eyebrow}</span>
+        <h3 className="mt-2 font-display text-2xl font-bold uppercase tracking-tight text-paper sm:text-3xl">
+          {title}
+        </h3>
+        <p className="mt-3 max-w-md text-sm leading-relaxed text-paper-dim">{description}</p>
+        <ul className="mt-4 flex flex-wrap gap-x-5 gap-y-2">
+          {tags.map((tag, i) => (
+            <Tag key={tag} label={tag} delay={i * 30} />
+          ))}
+        </ul>
+        <div className="mt-5 flex items-center gap-6 font-mono text-xs tracking-wide uppercase">
+          {statText && <span className="text-accent">{statText}</span>}
+          {link && (
+            <a
+              href={link}
+              target="_blank"
+              rel="noreferrer"
+              className="link-underline inline-flex items-center gap-1.5 text-paper transition-colors hover:text-accent"
+            >
+              {linkLabel ?? 'View'}
+              <span aria-hidden="true" className="text-[0.6875rem]">
+                ↗
+              </span>
+            </a>
+          )}
+        </div>
+      </div>
+    </motion.div>
+  )
 }
 
 export default function Projects() {
   const sectionRef = useRef<HTMLElement>(null)
 
   return (
-    <section id="projects" ref={sectionRef} className="relative">
-      <ProjectsPanel target={sectionRef} />
-      <div className="relative mx-auto max-w-6xl px-6 py-24 sm:px-8 lg:px-12">
-        <SectionHeading eyebrow="Log" title="Projects" />
-        <div className="mt-10 border-b border-ink-800">
-          {projects.map((project, index) => (
-            <ProjectRow key={project.title} project={project} delay={index * 80} />
-          ))}
-        </div>
+    <section
+      id="projects"
+      ref={sectionRef}
+      className="relative mx-auto max-w-6xl px-6 py-28 sm:px-8 lg:px-12"
+    >
+      <GridLines target={sectionRef} />
+
+      <div className="relative flex items-center gap-3">
+        <span aria-hidden="true" className="h-1.5 w-1.5 bg-accent" />
+        <span className="eyebrow">Exhibit</span>
       </div>
+      <h2 className="relative mt-2 font-display text-5xl font-bold uppercase tracking-tight text-paper sm:text-6xl">
+        Selected work
+      </h2>
+
+      <div className="relative mt-20 grid grid-cols-1 gap-x-8 gap-y-24 lg:grid-cols-12 lg:gap-y-16">
+        <ExhibitItem
+          className="lg:col-span-7 lg:col-start-1"
+          artifact={<CodelensArtifact />}
+          eyebrow={codelens.code}
+          title={codelens.title}
+          description={codelens.description}
+          tags={codelens.tags}
+          statText="150+ Tests"
+          link={codelens.link}
+          linkLabel="Live site"
+          delay={0}
+        />
+        <ExhibitItem
+          className="lg:col-span-4 lg:col-start-9 lg:mt-20"
+          artifact={<GymBudArtifact />}
+          eyebrow={gymbud.code}
+          title={gymbud.title}
+          description={gymbud.description}
+          tags={gymbud.tags}
+          link={gymbud.link}
+          linkLabel={gymbud.linkLabel}
+          delay={0.08}
+        />
+        <ExhibitItem
+          className="lg:col-span-8 lg:col-start-2 lg:mt-8"
+          artifact={<AlgoverseArtifact />}
+          eyebrow={algoverse.code}
+          title={algoverse.company}
+          description={algoverse.description}
+          tags={algoverse.tags}
+          link={algoverse.link}
+          linkLabel={algoverse.linkLabel}
+          delay={0.12}
+        />
+        <ExhibitItem
+          className="lg:col-span-4 lg:col-start-9 lg:mt-4"
+          artifact={<DubHacksArtifact />}
+          eyebrow={dubhacks.code}
+          title={dubhacks.title}
+          description={dubhacks.description}
+          tags={dubhacks.tags}
+          statText="3rd Place"
+          delay={0.2}
+        />
+      </div>
+
+      <p className="relative mt-24 font-mono text-xs text-paper-dim/60">
+        This site — React · TypeScript · Vite · Tailwind CSS · Resend
+      </p>
     </section>
   )
 }

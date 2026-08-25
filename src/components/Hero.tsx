@@ -1,8 +1,50 @@
 import { useEffect, useRef, useState, type MouseEvent } from 'react'
-import { motion, useScroll, useSpring, useTransform, useReducedMotion } from 'motion/react'
-import DimensionLine from './DimensionLine'
+import { motion, useReducedMotion } from 'motion/react'
 
-const CROP_MARK = 'absolute h-4 w-4 border-ink-600/70'
+// Hand-authored scatter for each letterform — not randomized, so the
+// assembly reads as designed (like cut letters being placed on a page)
+// rather than physics-random. x/y in px, r in degrees, delay in seconds.
+const LINE_ONE = [
+  { char: 'D', x: -64, y: -46, r: -16, delay: 0.02 },
+  { char: 'A', x: 52, y: -60, r: 13, delay: 0.16 },
+  { char: 'V', x: -38, y: 54, r: 20, delay: 0.09 },
+  { char: 'E', x: 70, y: 34, r: -11, delay: 0.24 },
+]
+
+const LINE_TWO = [
+  { char: 'Y', x: -80, y: 22, r: 15, delay: 0.32 },
+  { char: 'O', x: 56, y: -36, r: -18, delay: 0.44 },
+  { char: 'O', x: -28, y: 62, r: 9, delay: 0.38 },
+  { char: 'N', x: 84, y: -18, r: -13, delay: 0.52 },
+]
+
+function Letterline({
+  letters,
+  prefersReducedMotion,
+}: {
+  letters: typeof LINE_ONE
+  prefersReducedMotion: boolean
+}) {
+  return (
+    <div className="flex">
+      {letters.map((l, i) => (
+        <motion.span
+          key={`${l.char}-${i}`}
+          className="inline-block"
+          initial={prefersReducedMotion ? undefined : { x: l.x, y: l.y, rotate: l.r, opacity: 0 }}
+          animate={{ x: 0, y: 0, rotate: 0, opacity: 1 }}
+          transition={
+            prefersReducedMotion
+              ? { duration: 0 }
+              : { type: 'spring', stiffness: 130, damping: 13, mass: 0.9, delay: l.delay }
+          }
+        >
+          {l.char}
+        </motion.span>
+      ))}
+    </div>
+  )
+}
 
 export default function Hero() {
   const sectionRef = useRef<HTMLElement>(null)
@@ -22,20 +64,9 @@ export default function Hero() {
     setCursor({ x: event.clientX - rect.left, y: event.clientY - rect.top })
   }
 
-  // Crop marks stay put while the hero is comfortably in view, then open
-  // outward and fade only during the final stretch of scrolling past it —
-  // the frame releasing the sheet, not a constant drift.
-  const { scrollYProgress } = useScroll({ target: sectionRef, offset: ['start start', 'end start'] })
-  const rawExit = useTransform(scrollYProgress, [0, 0.65, 1], [0, 0, 1])
-  const exit = useSpring(rawExit, { stiffness: 300, damping: 40, restDelta: 0.001 })
-  const exitDistance = useTransform(exit, [0, 1], [0, prefersReducedMotion ? 0 : 14])
-  const exitDistanceNeg = useTransform(exitDistance, (v) => -v)
-  const exitOpacity = useTransform(exit, [0, 1], [1, prefersReducedMotion ? 1 : 0])
-
-  // The name plate reads cursor position as a physical instrument would —
-  // a couple of degrees of tilt, nothing more. Reuses the same cursor state
-  // already tracked for the coordinate readout, and only ever moves in
-  // response to the visitor's own mouse, never on its own.
+  // The assembled name reads cursor position as a physical object would —
+  // a couple of degrees of tilt, nothing more. Only ever moves in response
+  // to the visitor's own mouse, never on its own.
   const tiltX = cursor ? (cursor.y / (sectionRef.current?.offsetHeight || 800) - 0.5) * -3 : 0
   const tiltY = cursor ? (cursor.x / (sectionRef.current?.offsetWidth || 1200) - 0.5) * 3 : 0
 
@@ -45,91 +76,36 @@ export default function Hero() {
       id="home"
       onMouseMove={handleMouseMove}
       onMouseLeave={() => setCursor(null)}
-      className="relative mx-auto flex min-h-[92svh] w-full max-w-6xl flex-col justify-center overflow-hidden px-6 py-28 sm:px-8 lg:px-12"
+      className="relative mx-auto flex min-h-[92svh] w-full max-w-6xl flex-col justify-center px-6 py-28 sm:px-8 lg:px-12"
     >
-      <motion.span
-        className={`${CROP_MARK} top-6 left-6 border-t border-l sm:top-8 sm:left-8`}
-        style={{ x: exitDistanceNeg, y: exitDistanceNeg, opacity: exitOpacity }}
-        aria-hidden="true"
-      />
-      <motion.span
-        className={`${CROP_MARK} top-6 right-6 border-t border-r sm:top-8 sm:right-8`}
-        style={{ x: exitDistance, y: exitDistanceNeg, opacity: exitOpacity }}
-        aria-hidden="true"
-      />
-      <motion.span
-        className={`${CROP_MARK} bottom-6 left-6 border-b border-l sm:bottom-8 sm:left-8`}
-        style={{ x: exitDistanceNeg, y: exitDistance, opacity: exitOpacity }}
-        aria-hidden="true"
-      />
-      <motion.span
-        className={`${CROP_MARK} bottom-6 right-6 border-b border-r sm:bottom-8 sm:right-8`}
-        style={{ x: exitDistance, y: exitDistance, opacity: exitOpacity }}
-        aria-hidden="true"
-      />
-
-      {trackingEnabled && cursor && (
-        <span
-          aria-hidden="true"
-          className="pointer-events-none absolute z-10 font-mono text-[0.625rem] tracking-wider text-accent/70 tabular-nums"
-          style={{ left: cursor.x + 16, top: cursor.y + 12 }}
-        >
-          X {String(Math.max(0, Math.round(cursor.x))).padStart(4, '0')} Y{' '}
-          {String(Math.max(0, Math.round(cursor.y))).padStart(4, '0')}
-        </span>
-      )}
-
-      <div
-        className="animate-hero-in flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 font-mono text-[0.6875rem] tracking-[0.16em] text-paper-dim uppercase"
-        style={{ animationDelay: '0ms' }}
-      >
-        <span>University of Washington — Seattle, WA</span>
-        <span className="tabular">Rev. 2026.08</span>
-      </div>
-
       <motion.div
-        className="mt-6"
+        className="w-fit"
         animate={{ rotateX: tiltX, rotateY: tiltY }}
         transition={{ type: 'spring', stiffness: 150, damping: 20 }}
         style={{ transformPerspective: 900 }}
       >
         <h1 className="font-display text-[clamp(3.5rem,13vw,8.5rem)] leading-[0.85] font-extrabold uppercase tracking-tight text-paper">
-          <motion.span
-            className="block"
-            initial={{ clipPath: 'inset(0 100% 0 0)' }}
-            animate={{ clipPath: 'inset(0 0% 0 0)' }}
-            transition={{ type: 'spring', stiffness: 55, damping: 16, delay: 0.15 }}
-          >
-            Dave
-          </motion.span>
-          <motion.span
-            className="block"
-            initial={{ clipPath: 'inset(0 100% 0 0)' }}
-            animate={{ clipPath: 'inset(0 0% 0 0)' }}
-            transition={{ type: 'spring', stiffness: 55, damping: 16, delay: 0.32 }}
-          >
-            Yoon
-          </motion.span>
+          <Letterline letters={LINE_ONE} prefersReducedMotion={Boolean(prefersReducedMotion)} />
+          <Letterline letters={LINE_TWO} prefersReducedMotion={Boolean(prefersReducedMotion)} />
         </h1>
-        <motion.div
-          className="mt-5 max-w-xs origin-left"
-          initial={{ scaleX: 0 }}
-          animate={{ scaleX: 1 }}
-          transition={{ type: 'spring', stiffness: 220, damping: 26, delay: 0.75 }}
-        >
-          <DimensionLine />
-        </motion.div>
       </motion.div>
 
+      <div className="animate-hero-in mt-7 flex items-center gap-3" style={{ animationDelay: '620ms' }}>
+        <span aria-hidden="true" className="h-1.5 w-1.5 bg-accent" />
+        <span className="font-mono text-[0.6875rem] tracking-[0.16em] text-paper-dim uppercase">
+          Computer Science — University of Washington
+        </span>
+      </div>
+
       <p
-        className="animate-hero-in mt-8 max-w-xl text-lg leading-relaxed text-paper-dim"
-        style={{ animationDelay: '220ms' }}
+        className="animate-hero-in mt-6 max-w-xl text-lg leading-relaxed text-paper-dim"
+        style={{ animationDelay: '720ms' }}
       >
         CS student at the University of Washington. I ship across the
         stack: AI research tooling, iOS apps, and full-stack products.
       </p>
 
-      <div className="animate-hero-in mt-9 flex flex-wrap gap-4" style={{ animationDelay: '340ms' }}>
+      <div className="animate-hero-in mt-9 flex flex-wrap gap-4" style={{ animationDelay: '820ms' }}>
         <a
           href="#projects"
           className="group inline-flex items-center gap-2 rounded-[3px] bg-paper px-6 py-3 font-mono text-xs font-medium tracking-[0.08em] text-ink-950 uppercase transition-colors duration-200 hover:bg-accent"
