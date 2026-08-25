@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react'
-import SectionHeading from './SectionHeading'
+import Eyebrow from './Eyebrow'
+import MaskReveal from './MaskReveal'
 
 const CONTACT_EMAIL = 'dgyoon@cs.washington.edu'
 const CONTACT_PHONE = '(425) 365-2019'
@@ -65,11 +66,16 @@ export default function Contact() {
   }
 
   return (
-    <section id="contact" className="mx-auto max-w-6xl px-6 py-24 sm:px-8 lg:px-12">
-      <SectionHeading eyebrow="Reach" title="Contact" />
-      <p className="mt-6 max-w-xl text-lg leading-relaxed text-paper-dim">
-        Based in Sammamish, WA. Have a project in mind or just want to say
-        hi? Fill out the form and it'll land straight in my inbox.
+    <section id="contact" className="relative mx-auto max-w-6xl px-6 py-28 sm:px-8 lg:px-12">
+      <Eyebrow>Reach</Eyebrow>
+      <MaskReveal className="mt-6 max-w-2xl">
+        <p className="font-display text-3xl leading-[1.2] font-bold text-paper sm:text-4xl">
+          Based in Sammamish, WA. Have a project in mind or just want to
+          say hi?
+        </p>
+      </MaskReveal>
+      <p className="mt-4 max-w-md text-base leading-relaxed text-paper-dim">
+        Fill out the form and it'll land straight in my inbox.
       </p>
 
       <form onSubmit={handleSubmit} className="mt-10 flex max-w-xl flex-col gap-7">
