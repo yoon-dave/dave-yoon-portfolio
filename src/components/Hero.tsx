@@ -1,63 +1,151 @@
+import { useEffect, useRef, useState, type MouseEvent } from 'react'
+import { motion, useScroll, useSpring, useTransform, useReducedMotion } from 'motion/react'
+import DimensionLine from './DimensionLine'
+
+const CROP_MARK = 'absolute h-4 w-4 border-ink-600/70'
+
 export default function Hero() {
+  const sectionRef = useRef<HTMLElement>(null)
+  const [cursor, setCursor] = useState<{ x: number; y: number } | null>(null)
+  const [trackingEnabled, setTrackingEnabled] = useState(false)
+  const prefersReducedMotion = useReducedMotion()
+
+  useEffect(() => {
+    const fine = window.matchMedia('(pointer: fine)').matches
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    setTrackingEnabled(fine && !reduceMotion)
+  }, [])
+
+  const handleMouseMove = (event: MouseEvent<HTMLElement>) => {
+    if (!trackingEnabled || !sectionRef.current) return
+    const rect = sectionRef.current.getBoundingClientRect()
+    setCursor({ x: event.clientX - rect.left, y: event.clientY - rect.top })
+  }
+
+  // Crop marks stay put while the hero is comfortably in view, then open
+  // outward and fade only during the final stretch of scrolling past it —
+  // the frame releasing the sheet, not a constant drift.
+  const { scrollYProgress } = useScroll({ target: sectionRef, offset: ['start start', 'end start'] })
+  const rawExit = useTransform(scrollYProgress, [0, 0.65, 1], [0, 0, 1])
+  const exit = useSpring(rawExit, { stiffness: 300, damping: 40, restDelta: 0.001 })
+  const exitDistance = useTransform(exit, [0, 1], [0, prefersReducedMotion ? 0 : 14])
+  const exitDistanceNeg = useTransform(exitDistance, (v) => -v)
+  const exitOpacity = useTransform(exit, [0, 1], [1, prefersReducedMotion ? 1 : 0])
+
+  // The name plate reads cursor position as a physical instrument would —
+  // a couple of degrees of tilt, nothing more. Reuses the same cursor state
+  // already tracked for the coordinate readout, and only ever moves in
+  // response to the visitor's own mouse, never on its own.
+  const tiltX = cursor ? (cursor.y / (sectionRef.current?.offsetHeight || 800) - 0.5) * -3 : 0
+  const tiltY = cursor ? (cursor.x / (sectionRef.current?.offsetWidth || 1200) - 0.5) * 3 : 0
+
   return (
-    <section id="home" className="relative flex min-h-[90svh] items-center overflow-hidden">
-      <div className="relative z-10 mx-auto w-full max-w-5xl px-6 py-32">
-        <p
-          className="animate-hero-in font-mono text-sm font-medium tracking-widest text-indigo-500 dark:text-indigo-400"
-          style={{ animationDelay: '0ms' }}
+    <section
+      ref={sectionRef}
+      id="home"
+      onMouseMove={handleMouseMove}
+      onMouseLeave={() => setCursor(null)}
+      className="relative mx-auto flex min-h-[92svh] w-full max-w-6xl flex-col justify-center overflow-hidden px-6 py-28 sm:px-8 lg:px-12"
+    >
+      <motion.span
+        className={`${CROP_MARK} top-6 left-6 border-t border-l sm:top-8 sm:left-8`}
+        style={{ x: exitDistanceNeg, y: exitDistanceNeg, opacity: exitOpacity }}
+        aria-hidden="true"
+      />
+      <motion.span
+        className={`${CROP_MARK} top-6 right-6 border-t border-r sm:top-8 sm:right-8`}
+        style={{ x: exitDistance, y: exitDistanceNeg, opacity: exitOpacity }}
+        aria-hidden="true"
+      />
+      <motion.span
+        className={`${CROP_MARK} bottom-6 left-6 border-b border-l sm:bottom-8 sm:left-8`}
+        style={{ x: exitDistanceNeg, y: exitDistance, opacity: exitOpacity }}
+        aria-hidden="true"
+      />
+      <motion.span
+        className={`${CROP_MARK} bottom-6 right-6 border-b border-r sm:bottom-8 sm:right-8`}
+        style={{ x: exitDistance, y: exitDistance, opacity: exitOpacity }}
+        aria-hidden="true"
+      />
+
+      {trackingEnabled && cursor && (
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute z-10 font-mono text-[0.625rem] tracking-wider text-accent/70 tabular-nums"
+          style={{ left: cursor.x + 16, top: cursor.y + 12 }}
         >
-          00 / Hi, I'm
-        </p>
-        <h1
-          className="name-gradient animate-hero-in mt-4 text-5xl font-semibold tracking-tight sm:text-6xl"
-          style={{ animationDelay: '120ms' }}
-        >
-          Dave Yoon
-        </h1>
-        <p
-          className="animate-hero-in mt-6 max-w-xl text-lg text-slate-600 dark:text-slate-300"
-          style={{ animationDelay: '240ms' }}
-        >
-          I'm a CS student at the University of Washington who likes
-          shipping real projects, from AI research tools to iOS apps to
-          full-stack products.
-        </p>
-        <div className="animate-hero-in mt-8 flex gap-4" style={{ animationDelay: '360ms' }}>
-          <a
-            href="#projects"
-            className="group relative isolate overflow-hidden rounded-full bg-slate-900 px-6 py-3 text-sm font-medium text-white transition-[background-color,box-shadow] duration-300 hover:bg-slate-700 hover:shadow-[0_0_24px_-4px_rgba(99,102,241,0.6)] dark:bg-white dark:text-slate-900 dark:hover:bg-slate-200"
-          >
-            <span className="pointer-events-none absolute inset-y-0 left-0 w-1/3 -translate-x-[200%] skew-x-[-20deg] bg-gradient-to-r from-transparent via-white/30 to-transparent transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:translate-x-[400%] motion-reduce:hidden dark:via-white/50" />
-            <span className="relative">View my work</span>
-          </a>
-          <a
-            href="#contact"
-            className="group relative isolate overflow-hidden rounded-full border border-slate-300 bg-white/50 px-6 py-3 text-sm font-medium text-slate-700 backdrop-blur-sm transition-[border-color,box-shadow] duration-300 hover:border-indigo-400 hover:shadow-[0_0_20px_-6px_rgba(99,102,241,0.45)] dark:border-slate-700 dark:bg-slate-900/40 dark:text-slate-300 dark:hover:border-indigo-400"
-          >
-            <span className="pointer-events-none absolute inset-y-0 left-0 w-1/3 -translate-x-[200%] skew-x-[-20deg] bg-gradient-to-r from-transparent via-indigo-400/25 to-transparent transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:translate-x-[400%] motion-reduce:hidden dark:via-indigo-300/25" />
-            <span className="relative">Get in touch</span>
-          </a>
-        </div>
+          X {String(Math.max(0, Math.round(cursor.x))).padStart(4, '0')} Y{' '}
+          {String(Math.max(0, Math.round(cursor.y))).padStart(4, '0')}
+        </span>
+      )}
+
+      <div
+        className="animate-hero-in flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 font-mono text-[0.6875rem] tracking-[0.16em] text-paper-dim uppercase"
+        style={{ animationDelay: '0ms' }}
+      >
+        <span>University of Washington — Seattle, WA</span>
+        <span className="tabular">Rev. 2026.08</span>
       </div>
 
-      <a
-        href="#about"
-        aria-label="Scroll to About section"
-        className="absolute bottom-8 left-1/2 hidden -translate-x-1/2 animate-bounce text-slate-400 transition-colors hover:text-slate-600 motion-reduce:animate-none sm:block dark:text-slate-600 dark:hover:text-slate-400"
+      <motion.div
+        className="mt-6"
+        animate={{ rotateX: tiltX, rotateY: tiltY }}
+        transition={{ type: 'spring', stiffness: 150, damping: 20 }}
+        style={{ transformPerspective: 900 }}
       >
-        <svg
-          width="20"
-          height="20"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
+        <h1 className="font-display text-[clamp(3.5rem,13vw,8.5rem)] leading-[0.85] font-extrabold uppercase tracking-tight text-paper">
+          <motion.span
+            className="block"
+            initial={{ clipPath: 'inset(0 100% 0 0)' }}
+            animate={{ clipPath: 'inset(0 0% 0 0)' }}
+            transition={{ type: 'spring', stiffness: 55, damping: 16, delay: 0.15 }}
+          >
+            Dave
+          </motion.span>
+          <motion.span
+            className="block"
+            initial={{ clipPath: 'inset(0 100% 0 0)' }}
+            animate={{ clipPath: 'inset(0 0% 0 0)' }}
+            transition={{ type: 'spring', stiffness: 55, damping: 16, delay: 0.32 }}
+          >
+            Yoon
+          </motion.span>
+        </h1>
+        <motion.div
+          className="mt-5 max-w-xs origin-left"
+          initial={{ scaleX: 0 }}
+          animate={{ scaleX: 1 }}
+          transition={{ type: 'spring', stiffness: 220, damping: 26, delay: 0.75 }}
         >
-          <path d="M12 5v14M5 12l7 7 7-7" />
-        </svg>
-      </a>
+          <DimensionLine />
+        </motion.div>
+      </motion.div>
+
+      <p
+        className="animate-hero-in mt-8 max-w-xl text-lg leading-relaxed text-paper-dim"
+        style={{ animationDelay: '220ms' }}
+      >
+        CS student at the University of Washington. I ship across the
+        stack: AI research tooling, iOS apps, and full-stack products.
+      </p>
+
+      <div className="animate-hero-in mt-9 flex flex-wrap gap-4" style={{ animationDelay: '340ms' }}>
+        <a
+          href="#projects"
+          className="group inline-flex items-center gap-2 rounded-[3px] bg-paper px-6 py-3 font-mono text-xs font-medium tracking-[0.08em] text-ink-950 uppercase transition-colors duration-200 hover:bg-accent"
+        >
+          View projects
+          <span aria-hidden="true" className="transition-transform duration-200 group-hover:translate-x-0.5">
+            →
+          </span>
+        </a>
+        <a
+          href="#contact"
+          className="group inline-flex items-center gap-2 rounded-[3px] border border-ink-700 px-6 py-3 font-mono text-xs font-medium tracking-[0.08em] text-paper uppercase transition-colors duration-200 hover:border-accent hover:text-accent"
+        >
+          Get in touch
+        </a>
+      </div>
     </section>
   )
 }

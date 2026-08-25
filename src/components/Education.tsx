@@ -1,44 +1,44 @@
-import { useReveal } from '../hooks/useReveal'
+import { motion, useReducedMotion } from 'motion/react'
 import { education, type EducationEntry } from '../data/education'
 import SectionHeading from './SectionHeading'
 
-function EducationCard({ entry, delay }: { entry: EducationEntry; delay: number }) {
-  const reveal = useReveal<HTMLDivElement>(delay)
+function EducationRow({ entry, index }: { entry: EducationEntry; index: number }) {
+  const fromRight = index % 2 === 1
+  const prefersReducedMotion = useReducedMotion()
 
   return (
-    <div
-      ref={reveal.ref}
-      className={`rounded-2xl border border-slate-200 bg-white/60 p-6 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:border-indigo-300 hover:shadow-lg ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:hover:translate-y-0 dark:border-slate-800 dark:bg-slate-900/50 dark:hover:border-indigo-500/40 ${reveal.className}`}
-      style={reveal.style}
+    <motion.div
+      className="grid gap-x-6 gap-y-2 border-t border-ink-800 py-7 sm:grid-cols-[1fr_auto]"
+      initial={prefersReducedMotion ? undefined : { opacity: 0, x: fromRight ? 28 : -28 }}
+      whileInView={prefersReducedMotion ? undefined : { opacity: 1, x: 0 }}
+      viewport={{ once: true, margin: '-100px' }}
+      transition={{ type: 'spring', stiffness: 220, damping: 26 }}
     >
-      <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-        <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
-          {entry.school}
-        </h3>
-        <span className="text-sm text-slate-500 dark:text-slate-500">
-          {entry.location}
-        </span>
+      <div>
+        <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+          <h3 className="font-display text-2xl font-bold uppercase tracking-tight text-paper">
+            {entry.school}
+          </h3>
+          <span className="font-mono text-xs text-paper-dim">{entry.location}</span>
+        </div>
+        {entry.program && <p className="mt-1 font-mono text-xs text-paper-dim">{entry.program}</p>}
+        <p className="mt-2 text-sm font-medium text-accent">{entry.detail}</p>
+        <p className="mt-3 max-w-xl text-sm leading-relaxed text-paper-dim">
+          Relevant coursework: {entry.coursework}
+        </p>
       </div>
-      <p className="mt-1 text-sm font-medium text-indigo-600 dark:text-indigo-400">
-        {entry.detail}
-      </p>
-      <p className="mt-1 text-sm text-slate-500 dark:text-slate-500">
-        {entry.dates}
-      </p>
-      <p className="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
-        Relevant coursework: {entry.coursework}
-      </p>
-    </div>
+      <span className="font-mono text-xs tabular text-paper-dim sm:text-right">{entry.dates}</span>
+    </motion.div>
   )
 }
 
 export default function Education() {
   return (
-    <section id="education" className="mx-auto max-w-5xl px-6 py-24">
-      <SectionHeading number="02" title="Education" />
-      <div className="mt-10 flex flex-col gap-6">
+    <section id="education" className="mx-auto max-w-6xl px-6 py-24 sm:px-8 lg:px-12">
+      <SectionHeading eyebrow="Record" title="Education" />
+      <div className="mt-10 border-b border-ink-800">
         {education.map((entry, index) => (
-          <EducationCard key={entry.school} entry={entry} delay={index * 120} />
+          <EducationRow key={entry.school} entry={entry} index={index} />
         ))}
       </div>
     </section>

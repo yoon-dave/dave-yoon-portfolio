@@ -1,20 +1,21 @@
 import { useEffect, useRef, useState } from 'react'
 
 const links = [
-  { href: '#home', label: 'Home', id: 'home' },
   { href: '#about', label: 'About', id: 'about' },
-  { href: '#education', label: 'Education', id: 'education' },
   { href: '#projects', label: 'Projects', id: 'projects' },
+  { href: '#experience', label: 'Experience', id: 'experience' },
+  { href: '#education', label: 'Education', id: 'education' },
   { href: '#contact', label: 'Contact', id: 'contact' },
 ]
 
 export default function Nav() {
   const [active, setActive] = useState('home')
+  const [menuOpen, setMenuOpen] = useState(false)
   const linkRefs = useRef<Record<string, HTMLAnchorElement | null>>({})
   const [underline, setUnderline] = useState({ left: 0, width: 0 })
 
   useEffect(() => {
-    const sections = links
+    const sections = [{ id: 'home' }, ...links]
       .map((link) => document.getElementById(link.id))
       .filter((el): el is HTMLElement => el !== null)
 
@@ -38,19 +39,25 @@ export default function Nav() {
     const node = linkRefs.current[active]
     if (node) {
       setUnderline({ left: node.offsetLeft, width: node.offsetWidth })
+    } else {
+      setUnderline({ left: 0, width: 0 })
     }
   }, [active])
 
+  useEffect(() => {
+    setMenuOpen(false)
+  }, [active])
+
   return (
-    <header className="sticky top-0 z-50 border-b border-slate-200/80 bg-white/80 backdrop-blur dark:border-slate-800/80 dark:bg-slate-950/80">
-      <nav className="mx-auto flex max-w-5xl items-center justify-between gap-4 overflow-x-auto px-6 py-4">
+    <header className="sticky top-0 z-50 border-b border-ink-800 bg-ink-950/90 backdrop-blur">
+      <nav className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-6 py-4 sm:px-8 lg:px-12">
         <a
           href="#home"
-          className="shrink-0 text-sm font-semibold tracking-tight text-slate-900 transition-colors duration-300 hover:text-indigo-500 dark:text-white dark:hover:text-indigo-400"
+          className="shrink-0 font-display text-lg font-bold uppercase tracking-wide text-paper transition-colors duration-200 hover:text-accent"
         >
           Dave Yoon
         </a>
-        <ul className="relative flex shrink-0 gap-6 text-sm font-medium text-slate-600 dark:text-slate-400">
+        <ul className="relative hidden shrink-0 gap-7 font-mono text-xs tracking-[0.1em] text-paper-dim uppercase sm:flex">
           {links.map((link) => (
             <li key={link.href}>
               <a
@@ -58,10 +65,8 @@ export default function Nav() {
                   linkRefs.current[link.id] = node
                 }}
                 href={link.href}
-                className={`block whitespace-nowrap py-1 transition-colors ${
-                  active === link.id
-                    ? 'text-slate-900 dark:text-white'
-                    : 'hover:text-slate-900 dark:hover:text-white'
+                className={`block py-1 whitespace-nowrap transition-colors duration-200 ${
+                  active === link.id ? 'text-paper' : 'hover:text-paper'
                 }`}
               >
                 {link.label}
@@ -69,11 +74,43 @@ export default function Nav() {
             </li>
           ))}
           <span
-            className="absolute -bottom-1 h-0.5 rounded-full bg-indigo-500 transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none"
+            className="absolute -bottom-1 h-[2px] bg-accent transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none"
             style={{ left: underline.left, width: underline.width }}
           />
         </ul>
+
+        <button
+          type="button"
+          aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+          aria-expanded={menuOpen}
+          onClick={() => setMenuOpen((open) => !open)}
+          className="flex h-8 w-8 shrink-0 flex-col items-center justify-center gap-[5px] sm:hidden"
+        >
+          <span
+            className={`h-px w-5 bg-paper transition-transform duration-200 ${menuOpen ? 'translate-y-[3px] rotate-45' : ''}`}
+          />
+          <span
+            className={`h-px w-5 bg-paper transition-transform duration-200 ${menuOpen ? '-rotate-45' : ''}`}
+          />
+        </button>
       </nav>
+
+      {menuOpen && (
+        <ul className="border-t border-ink-800 font-mono text-sm tracking-[0.08em] text-paper-dim uppercase sm:hidden">
+          {links.map((link) => (
+            <li key={link.href} className="border-b border-ink-800">
+              <a
+                href={link.href}
+                className={`block px-6 py-4 transition-colors duration-200 ${
+                  active === link.id ? 'text-accent' : 'hover:text-paper'
+                }`}
+              >
+                {link.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      )}
     </header>
   )
 }

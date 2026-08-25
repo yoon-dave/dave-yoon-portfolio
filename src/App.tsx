@@ -1,31 +1,33 @@
+import { MotionConfig } from 'motion/react'
 import Nav from './components/Nav'
 import Hero from './components/Hero'
 import About from './components/About'
-import Education from './components/Education'
 import Projects from './components/Projects'
+import Experience from './components/Experience'
+import Education from './components/Education'
 import Contact from './components/Contact'
 import ScrollProgress from './components/ScrollProgress'
 import ScrollToTop from './components/ScrollToTop'
-import AmbientBackground from './components/AmbientBackground'
+import TitleBlock from './components/TitleBlock'
 
 function App() {
   return (
-    <div className="min-h-svh text-slate-700 dark:text-slate-200">
-      <AmbientBackground />
-      <ScrollProgress />
-      <Nav />
-      <main>
-        <Hero />
-        <About />
-        <Education />
-        <Projects />
-        <Contact />
-      </main>
-      <footer className="border-t border-slate-200 px-6 py-8 text-center text-sm text-slate-500 dark:border-slate-800 dark:text-slate-500">
-        © {new Date().getFullYear()} Dave Yoon. Built with React & Tailwind CSS.
-      </footer>
-      <ScrollToTop />
-    </div>
+    <MotionConfig reducedMotion="user">
+      <div className="min-h-svh bg-ink-950 text-paper">
+        <ScrollProgress />
+        <Nav />
+        <main>
+          <Hero />
+          <About />
+          <Projects />
+          <Experience />
+          <Education />
+          <Contact />
+        </main>
+        <TitleBlock />
+        <ScrollToTop />
+      </div>
+    </MotionConfig>
   )
 }
 
