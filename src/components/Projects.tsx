@@ -8,7 +8,9 @@ import CodelensArtifact from './projects/CodelensArtifact'
 import GymBudArtifact from './projects/GymBudArtifact'
 import AlgoverseArtifact from './projects/AlgoverseArtifact'
 import DubHacksArtifact from './projects/DubHacksArtifact'
+import PlatformerArtifact from './projects/PlatformerArtifact'
 
+const platformer = projects.find((p) => p.title === 'Learning to Jump')!
 const codelens = projects.find((p) => p.title === 'Codelens')!
 const gymbud = projects.find((p) => p.title === 'GymBud')!
 const dubhacks = projects.find((p) => p.title === 'T-Mobile AI Pricing Assistant')!
@@ -143,6 +145,19 @@ export default function Projects() {
         <div className="relative mt-20 grid grid-cols-1 gap-x-8 gap-y-24 lg:grid-cols-12 lg:gap-y-16">
         <ExhibitItem
           className="lg:col-span-7 lg:col-start-1"
+          artifact={<PlatformerArtifact />}
+          eyebrow={platformer.code}
+          title={platformer.title}
+          description={platformer.description}
+          tags={platformer.tags}
+          statText="100% Solved"
+          link={platformer.link}
+          linkLabel={platformer.linkLabel}
+          delay={0}
+          oversized
+        />
+        <ExhibitItem
+          className="lg:col-span-4 lg:col-start-9 lg:mt-20"
           artifact={<CodelensArtifact />}
           eyebrow={codelens.code}
           title={codelens.title}
@@ -151,11 +166,10 @@ export default function Projects() {
           statText="150+ Tests"
           link={codelens.link}
           linkLabel="Live site"
-          delay={0}
-          oversized
+          delay={0.08}
         />
         <ExhibitItem
-          className="lg:col-span-4 lg:col-start-9 lg:mt-20"
+          className="lg:col-span-7 lg:col-start-2 lg:mt-8"
           artifact={<GymBudArtifact />}
           eyebrow={gymbud.code}
           title={gymbud.title}
@@ -163,10 +177,10 @@ export default function Projects() {
           tags={gymbud.tags}
           link={gymbud.link}
           linkLabel={gymbud.linkLabel}
-          delay={0.08}
+          delay={0.12}
         />
         <ExhibitItem
-          className="lg:col-span-7 lg:col-start-2 lg:mt-8"
+          className="lg:col-span-4 lg:col-start-9 lg:mt-24"
           artifact={<AlgoverseArtifact />}
           eyebrow={algoverse.code}
           title={algoverse.company}
@@ -174,17 +188,17 @@ export default function Projects() {
           tags={algoverse.tags}
           link={algoverse.link}
           linkLabel={algoverse.linkLabel}
-          delay={0.12}
+          delay={0.2}
         />
         <ExhibitItem
-          className="lg:col-span-4 lg:col-start-9 lg:mt-24"
+          className="lg:col-span-7 lg:col-start-1 lg:mt-8"
           artifact={<DubHacksArtifact />}
           eyebrow={dubhacks.code}
           title={dubhacks.title}
           description={dubhacks.description}
           tags={dubhacks.tags}
           statText="3rd Place"
-          delay={0.2}
+          delay={0.28}
         />
         </div>
 

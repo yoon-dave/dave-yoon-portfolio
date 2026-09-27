@@ -13,6 +13,17 @@ export interface Project {
 
 export const projects: Project[] = [
   {
+    title: 'Learning to Jump',
+    code: 'Reinforcement Learning · Independent Research',
+    description:
+      'Trained an RL agent to clear a custom 2D platformer level. Plain PPO plateaued at 49% single-attempt completion, even with expert demonstrations mixed into training the whole way through. Diagnosing that the agent had no way to sense elapsed time since landing, then giving it one self-derived feature and switching to direct behavioral cloning from a working expert, solved the level completely.',
+    tags: ['Python', 'PyTorch', 'Stable-Baselines3', 'PPO', 'Gymnasium'],
+    statNumber: 100,
+    statSuffix: '% Solved',
+    link: 'https://claude.ai/artifact/JWWcmNuGe6s949bpnwKbnT',
+    linkLabel: 'Watch it play',
+  },
+  {
     title: 'Codelens',
     code: 'AI Code Review Platform · Independent',
     description:
