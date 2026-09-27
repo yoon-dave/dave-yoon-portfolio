@@ -179,12 +179,12 @@
   <p class="eyebrow">level_1 &middot; PPO, then a fix</p>
   <h1>Learning to Jump</h1>
   <p class="intro">
-    Five real playthroughs, pulled straight from the training checkpoints
-    with no edits or speedup. The first four are a PPO agent slowly working
-    out the level from reward alone, and it never gets much past one clear
-    in two. The fifth is a different idea, and it's the one that actually
-    works. <b>Every completion rate below comes from a real batch of
-    evaluation episodes</b>, not just the one clip you're watching.
+    Five playthroughs, pulled straight from the training checkpoints with no
+    edits or speedup. The first four are a PPO agent slowly working out the
+    level from reward alone, and it never gets much past one clear in two.
+    The fifth throws out that whole approach, and that's the one that
+    works. <b>The completion numbers next to each clip come from hundreds
+    or thousands of separate runs</b>, not just the one you're watching.
   </p>
 
   <div class="arc">
@@ -206,7 +206,7 @@
       <h2 class="stage-title">Learning the basics</h2>
     </div>
     <span class="stage-steps">50,000 training steps</span>
-    <p class="stage-desc">It's figured out that running right is a good idea, but it has no sense of the gap ahead. It just walks straight into it.</p>
+    <p class="stage-desc">It knows to run right. It has no idea there's a gap coming, so it just walks off the edge.</p>
     <div class="stat-row">
       <span class="stat-pill zero">0% completion</span>
       <div class="bar-track"><div class="bar-fill zero"></div></div>
@@ -221,7 +221,7 @@
       <h2 class="stage-title">Finding the goal</h2>
     </div>
     <span class="stage-steps">100,000 training steps</span>
-    <p class="stage-desc">It's started timing jumps correctly, at least sometimes. This clip is a real clear, but at this point it's still failing more often than not.</p>
+    <p class="stage-desc">It's started timing jumps right, at least sometimes. This clip happens to be one of the good ones, but at this stage it still fails more often than it clears.</p>
     <div class="stat-row">
       <span class="stat-pill mid">20% completion</span>
       <div class="bar-track"><div class="bar-fill" style="width:20%"></div></div>
@@ -236,7 +236,7 @@
       <h2 class="stage-title">Getting consistent</h2>
     </div>
     <span class="stage-steps">250,000 training steps</span>
-    <p class="stage-desc">Clearing the gaps is a real skill now, not a lucky roll. This is measured across a much bigger batch of runs than the earlier stages.</p>
+    <p class="stage-desc">By now it's clearing gaps on purpose, not by luck, and this checkpoint was tested across a much bigger batch of runs than the first two.</p>
     <div class="stat-row">
       <span class="stat-pill mid">30.7% completion</span>
       <div class="bar-track"><div class="bar-fill" style="width:30.7%"></div></div>
@@ -251,7 +251,7 @@
       <h2 class="stage-title">Plays confidently</h2>
     </div>
     <span class="stage-steps">460,000 training steps, the best PPO checkpoint we found</span>
-    <p class="stage-desc">It reaches the goal here. This is its second try in a row, which tracks: at this checkpoint it wins about half the time.</p>
+    <p class="stage-desc">It reaches the goal here, on the second try in a row. That fits: this checkpoint wins about half the time it plays.</p>
     <div class="stat-row">
       <span class="stat-pill good">49.0% completion</span>
       <div class="bar-track"><div class="bar-fill good" style="width:49%"></div></div>
@@ -267,13 +267,13 @@
     </div>
     <span class="stage-steps">no PPO this time, just direct imitation of a working expert</span>
     <p class="stage-desc">
-      Turns out PPO's ceiling wasn't a training problem. This level needs a
-      jump at one exact moment after landing, and the agent's view of the
-      world looks almost identical for fifteen ticks on either side of that
-      moment. It couldn't feel time passing. We gave it one feature it
-      tracks itself, ticks since it last touched ground, and had it copy a
+      PPO's ceiling wasn't a training problem. This level needs a jump at
+      one exact moment after landing, and for about fifteen ticks on either
+      side of that moment, the agent's view of the world barely changes. It
+      has no way to feel time passing. So we gave it one feature it tracks
+      on its own, ticks since it last touched ground, and had it copy a
       simple rule-based controller that already solves the level every
-      time. No reward signal needed. That was enough.
+      time. No reward signal, no PPO. That was enough.
     </p>
     <div class="stat-row">
       <span class="stat-pill good">100% det, 97.2% stochastic</span>
@@ -284,14 +284,13 @@
 
   <div class="footer">
     <p>
-      <b>What actually happened:</b> PPO training, even with expert
-      demonstrations mixed in the whole way through, topped out around a
-      49% success rate per attempt and wouldn't budge past it. Making the
-      policy more confident in its own decisions made it worse, which told
-      us it had never actually found a confident answer, just something
-      that worked often enough. The fix wasn't a better training run. It
-      was noticing the agent literally couldn't sense the one thing this
-      level needed it to sense, and giving it that.
+      PPO training, even with expert demonstrations mixed in the whole way
+      through, topped out around a 49% success rate per attempt and
+      wouldn't budge. Making the policy more confident in its own decisions
+      made it worse, which told us it had never found a genuinely confident
+      answer, just something that worked often enough. The fix wasn't a
+      better training run. It was noticing the agent couldn't sense the one
+      thing this level needed it to sense, and giving it that.
     </p>
     <p>
       Before we found that fix, taking the best of 4 attempts from the
