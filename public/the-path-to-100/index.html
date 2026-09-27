@@ -1,0 +1,485 @@
+<title>The Path to 100%</title>
+<meta name="description" content="Every real approach tried on one platforming level, in order, with real measured completion rates and a plain explanation of what happened at each step.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.5.1/chart.umd.min.js"></script>
+<style>
+  :root {
+    --ink-950: #0f141b;
+    --ink-900: #171f28;
+    --ink-800: #212b36;
+    --ink-700: #2d3947;
+    --ink-600: #47566a;
+    --paper: #ece8e0;
+    --paper-dim: #8f99a6;
+    --accent: #7fa9cc;
+    --good: #7fb88f;
+    --bad: #c97b74;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--ink-950);
+    color: var(--paper);
+    font-family: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+    padding: 0 20px;
+    padding-block: 32px 56px;
+    font-size: 14.5px;
+  }
+  .wrap { max-width: 900px; margin: 0 auto; }
+  a { color: var(--accent); }
+
+  .eyebrow {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--paper-dim);
+    margin: 0 0 10px;
+  }
+  h1 {
+    font-family: "Big Shoulders Display", "Arial Narrow", sans-serif;
+    font-weight: 800;
+    font-size: clamp(32px, 7vw, 52px);
+    letter-spacing: -0.5px;
+    text-transform: uppercase;
+    line-height: 1;
+    margin: 0 0 14px;
+    text-wrap: balance;
+  }
+  .intro {
+    color: var(--paper-dim);
+    font-size: 14px;
+    line-height: 1.6;
+    max-width: 66ch;
+    margin: 0 0 22px;
+  }
+  .intro b { color: var(--paper); font-weight: 600; }
+
+  .stat-strip {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--ink-700);
+    border: 1px solid var(--ink-700);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+  .stat-tile {
+    background: var(--ink-900);
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .stat-value {
+    font-family: "IBM Plex Mono", monospace;
+    font-variant-numeric: tabular-nums;
+    font-size: clamp(18px, 3.5vw, 22px);
+    font-weight: 600;
+  }
+  .stat-value.bad { color: var(--bad); }
+  .stat-value.good { color: var(--good); }
+  .stat-label { font-size: 11px; color: var(--paper-dim); }
+
+  .chart-card {
+    background: var(--ink-900);
+    border: 1px solid var(--ink-700);
+    border-radius: 3px;
+    padding: 16px 16px 6px;
+    margin-bottom: 26px;
+  }
+  .chart-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 2px;
+  }
+  .chart-title {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--paper-dim);
+    margin: 0;
+  }
+  .chart-hint {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11px;
+    color: var(--paper-dim);
+  }
+  .chart-wrap { position: relative; height: 260px; }
+  .legend {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11px;
+    color: var(--paper-dim);
+    padding: 8px 2px 14px;
+  }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .swatch { width: 9px; height: 9px; display: inline-block; }
+
+  .timeline-head {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    color: var(--paper-dim);
+    text-transform: uppercase;
+    margin: 0 0 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--ink-700);
+  }
+
+  .gen-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .gen {
+    background: var(--ink-900);
+    border: 1px solid var(--ink-700);
+    border-radius: 3px;
+    padding: 14px 16px;
+    scroll-margin-top: 20px;
+    transition: box-shadow 0.4s ease, border-color 0.4s ease;
+  }
+  .gen.wide { grid-column: 1 / -1; }
+  .gen.solved { border-color: var(--good); }
+  .gen.regression { border-color: rgba(201,123,116,0.4); }
+  .gen.flash {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 1px rgba(127,169,204,0.35);
+  }
+
+  .gen-head { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; margin-bottom: 5px; }
+  .gen-num {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11px;
+    color: var(--ink-600);
+  }
+  .gen.solved .gen-num { color: var(--good); }
+  .gen-title {
+    font-family: "Big Shoulders Display", "Arial Narrow", sans-serif;
+    font-weight: 700;
+    font-size: 18px;
+    letter-spacing: -0.2px;
+    text-transform: uppercase;
+    margin: 0;
+  }
+  .gen-tag {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 1px 6px;
+    border: 1px solid var(--ink-700);
+    border-radius: 3px;
+    margin-left: auto;
+    white-space: nowrap;
+  }
+  .gen-tag.win { border-color: var(--good); color: var(--good); }
+  .gen-tag.small-win { border-color: var(--accent); color: var(--accent); }
+  .gen-tag.no-change { color: var(--paper-dim); }
+  .gen-tag.regress { border-color: var(--bad); color: var(--bad); }
+
+  .gen-hyp {
+    font-size: 12.5px;
+    color: var(--paper-dim);
+    line-height: 1.5;
+    margin: 0 0 10px;
+  }
+  .gen-hyp b { color: var(--paper); font-weight: 600; }
+
+  .gen-stats { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+  .metric {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11.5px;
+    color: var(--paper-dim);
+    background: var(--ink-800);
+    border: 1px solid var(--ink-700);
+    border-radius: 3px;
+    padding: 3px 8px;
+  }
+  .metric b { font-variant-numeric: tabular-nums; color: var(--paper); }
+  .metric.good b { color: var(--good); }
+  .metric.bad b { color: var(--bad); }
+
+  .gen-explain {
+    font-size: 12.5px;
+    line-height: 1.55;
+    color: var(--paper);
+    margin: 0;
+    padding-top: 9px;
+    border-top: 1px solid var(--ink-700);
+  }
+
+  .gen-clip {
+    width: 100%;
+    max-width: 380px;
+    aspect-ratio: 1400 / 600;
+    background: #05070b;
+    border-radius: 3px;
+    overflow: hidden;
+    border: 1px solid var(--ink-700);
+    margin: 2px 0 12px;
+  }
+  .gen-clip img { width: 100%; height: 100%; display: block; object-fit: contain; image-rendering: pixelated; }
+  .gen.solved .gen-clip { border-color: var(--good); }
+  .clip-note {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 10.5px;
+    color: var(--paper-dim);
+    margin: -6px 0 12px;
+  }
+
+  @media (max-width: 620px) {
+    .gen-grid { grid-template-columns: 1fr; }
+    .stat-strip { grid-template-columns: 1fr; }
+  }
+</style>
+
+<div class="wrap">
+  <p class="eyebrow">level_1 &middot; PPO to behavioral cloning</p>
+  <h1>The Path to 100%</h1>
+  <p class="intro">
+    Every real approach tried, in the order we tried them, with the actual
+    numbers each one produced. Not just the ones that worked. Click a bar
+    in the chart to jump to that generation's card.
+    <b>Deterministic</b> means the policy always takes its single most
+    likely action; <b>stochastic</b> means it samples, the way it actually
+    trained.
+  </p>
+
+  <div class="stat-strip">
+    <div class="stat-tile">
+      <span class="stat-value">8</span>
+      <span class="stat-label">generations tried</span>
+    </div>
+    <div class="stat-tile">
+      <span class="stat-value bad">0%</span>
+      <span class="stat-label">where it started (1,000-episode measurement)</span>
+    </div>
+    <div class="stat-tile">
+      <span class="stat-value good">100%</span>
+      <span class="stat-label">where it ended, single attempt</span>
+    </div>
+  </div>
+
+  <div class="chart-card">
+    <div class="chart-head">
+      <h2 class="chart-title">Completion rate by generation</h2>
+      <span class="chart-hint">click a bar &rarr; jump to details</span>
+    </div>
+    <div class="chart-wrap"><canvas id="genChart"></canvas></div>
+    <div class="legend">
+      <span><span class="swatch" style="background:#c97b74"></span>deterministic (greedy)</span>
+      <span><span class="swatch" style="background:#7fa9cc"></span>stochastic (sampled)</span>
+    </div>
+  </div>
+
+  <p class="timeline-head">Generations</p>
+
+  <div class="gen-grid">
+    <div class="gen" id="gen-0">
+      <div class="gen-head">
+        <span class="gen-num">00</span>
+        <h3 class="gen-title">Baseline PPO</h3>
+        <span class="gen-tag no-change">Start</span>
+      </div>
+      <p class="gen-hyp">Plain PPO on the shaped reward, standard hyperparameters, no help from anywhere else.</p>
+      <div class="gen-stats">
+        <span class="metric bad">det <b>0.0%</b></span>
+        <span class="metric bad">stoch <b>0.0%</b></span>
+      </div>
+      <p class="gen-explain">The level needs one jump timed to a specific tick. PPO's own exploration never reliably stumbles onto it.</p>
+    </div>
+
+    <div class="gen" id="gen-1">
+      <div class="gen-head">
+        <span class="gen-num">01</span>
+        <h3 class="gen-title">Learning-rate decay</h3>
+        <span class="gen-tag small-win">Small win</span>
+      </div>
+      <p class="gen-hyp"><b>Idea:</b> decay the learning rate through the back half of training, so late updates stop overwriting behavior that already works.</p>
+      <div class="gen-stats">
+        <span class="metric bad">det <b>0.0%</b></span>
+        <span class="metric good">stoch <b>7.5%</b></span>
+      </div>
+      <p class="gen-explain">A real, repeatable improvement, but a small one. It doesn't touch the actual reason the agent isn't finding the jump.</p>
+    </div>
+
+    <div class="gen" id="gen-2">
+      <div class="gen-head">
+        <span class="gen-num">02</span>
+        <h3 class="gen-title">A bigger batch</h3>
+        <span class="gen-tag no-change">No change</span>
+      </div>
+      <p class="gen-hyp"><b>Idea:</b> a larger PPO batch (256 vs. 64), stacked on Gen 1, might cut the gradient noise diluting the rare JUMP action's signal.</p>
+      <div class="gen-stats">
+        <span class="metric bad">det <b>0.0%</b></span>
+        <span class="metric">stoch <b>7.2%</b></span>
+      </div>
+      <p class="gen-explain">No improvement over decay alone. Batch size wasn't the bottleneck.</p>
+    </div>
+
+    <div class="gen" id="gen-3">
+      <div class="gen-head">
+        <span class="gen-num">03</span>
+        <h3 class="gen-title">Warm-start from an expert</h3>
+        <span class="gen-tag regress">Failed</span>
+      </div>
+      <p class="gen-hyp"><b>Idea:</b> before any PPO training starts, copy a simple rule-based controller that already solves the level every time directly into the policy.</p>
+      <div class="gen-stats">
+        <span class="metric bad">det <b>0.0%</b></span>
+        <span class="metric bad">stoch <b>0.1%</b></span>
+      </div>
+      <p class="gen-explain">Overwritten by PPO's own gradient updates within roughly 10,000 steps. A one-time pretrain doesn't survive.</p>
+    </div>
+
+    <div class="gen wide" id="gen-4">
+      <div class="gen-head">
+        <span class="gen-num">04</span>
+        <h3 class="gen-title">Persistent cloning pressure</h3>
+        <span class="gen-tag win">Breakthrough</span>
+      </div>
+      <p class="gen-hyp"><b>Idea:</b> instead of copying the expert once, keep reapplying a small, decaying dose of that same pressure after every rollout, so it can't get forgotten.</p>
+      <div class="gen-clip"><img src="stage4.gif" alt="Best checkpoint of the persistent cloning run reaching the goal" loading="lazy"></div>
+      <p class="clip-note">best checkpoint, 460k steps, second attempt shown &middot; full checkpoint progression on the <a href="/learning-to-jump/" target="_blank" rel="noopener">companion page</a></p>
+      <div class="gen-stats">
+        <span class="metric good">stoch <b>33.2%</b> final</span>
+        <span class="metric good">stoch <b>49.0%</b> best ckpt</span>
+        <span class="metric bad">det <b>0.0%</b></span>
+      </div>
+      <p class="gen-explain">The breakthrough of the whole PPO effort, and the first variant with no checkpoint stuck at 0%. Persistent pressure stops the forgetting that killed Gen 03.</p>
+    </div>
+
+    <div class="gen regression" id="gen-5">
+      <div class="gen-head">
+        <span class="gen-num">05</span>
+        <h3 class="gen-title">2x entropy bonus</h3>
+        <span class="gen-tag regress">Regression</span>
+      </div>
+      <p class="gen-hyp"><b>Idea:</b> double PPO's entropy coefficient, hoping more built-in exploration would reinforce the behavior Gen 04 found.</p>
+      <div class="gen-stats">
+        <span class="metric">stoch (400k) <b>35%</b></span>
+        <span class="metric bad">stoch (500k) <b>0.0%</b></span>
+      </div>
+      <p class="gen-explain">Destabilized late training instead of helping. A promising 400k checkpoint had fallen to zero by 500k.</p>
+    </div>
+
+    <div class="gen regression" id="gen-6">
+      <div class="gen-head">
+        <span class="gen-num">06</span>
+        <h3 class="gen-title">Broader demos + entropy decay</h3>
+        <span class="gen-tag regress">Regression</span>
+      </div>
+      <p class="gen-hyp"><b>Idea:</b> two changes at once. Cover more than the golden path with recovery demonstrations, and decay the entropy bonus so the policy can settle late.</p>
+      <div class="gen-stats">
+        <span class="metric bad">det <b>0.0%</b></span>
+        <span class="metric bad">stoch (500k) <b>0.0%</b></span>
+      </div>
+      <p class="gen-explain">Also negative, and a process mistake: bundling two untested changes into one run means we can't tell which one caused it.</p>
+    </div>
+
+    <div class="gen solved wide" id="gen-7">
+      <div class="gen-head">
+        <span class="gen-num">07</span>
+        <h3 class="gen-title">A memory feature, no PPO at all</h3>
+        <span class="gen-tag win">Solved</span>
+      </div>
+      <p class="gen-hyp"><b>Idea:</b> the bottleneck was never the training method. Once the agent's speed maxes out, its view of the world barely changes for fifteen ticks, and it has no way to tell how long it's been running. Give it that one feature (ticks since it last touched ground, built only from what it already sees) and skip PPO entirely in favor of directly copying the expert.</p>
+      <div class="gen-clip"><img src="stage5.gif" alt="The solved policy reaching the goal deterministically" loading="lazy"></div>
+      <div class="gen-stats">
+        <span class="metric good">det <b>100%</b></span>
+        <span class="metric good">stoch <b>97.2%</b></span>
+      </div>
+      <p class="gen-explain">Not a guess we got lucky on. An instrumented trace of a 98%-accurate clone showed its jump probability sitting completely flat for fifteen consecutive ticks. One self-derived feature fixed it completely.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  var labels = [
+    "00", "01", "02", "03", "04", "05", "06", "07"
+  ];
+  var det = [0, 0, 0, 0, 0, null, 0, 100];
+  var stoch = [0, 7.5, 7.2, 0.1, 49.0, 0, 0, 97.2];
+  var ids = ["gen-0","gen-1","gen-2","gen-3","gen-4","gen-5","gen-6","gen-7"];
+
+  var ctx = document.getElementById("genChart").getContext("2d");
+  var chart = new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: "Deterministic",
+          data: det,
+          backgroundColor: "#c97b74",
+          borderRadius: 2,
+          maxBarThickness: 20
+        },
+        {
+          label: "Stochastic",
+          data: stoch,
+          backgroundColor: "#7fa9cc",
+          borderRadius: 2,
+          maxBarThickness: 20
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      onClick: function (evt, elements) {
+        if (!elements.length) return;
+        var idx = elements[0].index;
+        var el = document.getElementById(ids[idx]);
+        if (!el) return;
+        el.scrollIntoView({ behavior: "smooth", block: "center" });
+        el.classList.add("flash");
+        setTimeout(function () { el.classList.remove("flash"); }, 1400);
+      },
+      onHover: function (evt, elements) {
+        evt.native.target.style.cursor = elements.length ? "pointer" : "default";
+      },
+      scales: {
+        y: {
+          min: 0,
+          max: 100,
+          ticks: { color: "#8f99a6", font: { family: "IBM Plex Mono", size: 10.5 }, callback: function (v) { return v + "%"; } },
+          grid: { color: "#2d3947" }
+        },
+        x: {
+          ticks: { color: "#8f99a6", font: { family: "IBM Plex Mono", size: 10.5 } },
+          grid: { display: false }
+        }
+      },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: "#171f28",
+          borderColor: "#2d3947",
+          borderWidth: 1,
+          titleFont: { family: "IBM Plex Mono" },
+          bodyFont: { family: "IBM Plex Mono" },
+          callbacks: {
+            label: function (item) {
+              var v = item.raw;
+              return item.dataset.label + ": " + (v === null ? "not measured this way" : v + "%");
+            }
+          }
+        }
+      }
+    }
+  });
+})();
+</script>

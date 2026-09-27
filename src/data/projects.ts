@@ -20,7 +20,7 @@ export const projects: Project[] = [
     tags: ['Python', 'PyTorch', 'Stable-Baselines3', 'PPO', 'Gymnasium'],
     statNumber: 100,
     statSuffix: '% Solved',
-    link: 'https://claude.ai/artifact/JWWcmNuGe6s949bpnwKbnT',
+    link: '/learning-to-jump/',
     linkLabel: 'Watch it play',
   },
   {

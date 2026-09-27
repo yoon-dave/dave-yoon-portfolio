@@ -1,0 +1,304 @@
+<title>Learning to Jump</title>
+<meta name="description" content="Five real playthroughs from a training run, from an agent that walks straight into a pit to one that clears the level on command.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink-950: #0f141b;
+    --ink-900: #171f28;
+    --ink-800: #212b36;
+    --ink-700: #2d3947;
+    --ink-600: #47566a;
+    --paper: #ece8e0;
+    --paper-dim: #8f99a6;
+    --accent: #7fa9cc;
+    --good: #7fb88f;
+    --bad: #c97b74;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--ink-950);
+    color: var(--paper);
+    font-family: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+    padding: 0 20px;
+    padding-block: 32px 56px;
+    font-size: 14.5px;
+  }
+  .wrap { max-width: 760px; margin: 0 auto; }
+
+  .eyebrow {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--paper-dim);
+    margin: 0 0 10px;
+  }
+  h1 {
+    font-family: "Big Shoulders Display", "Arial Narrow", sans-serif;
+    font-weight: 800;
+    font-size: clamp(32px, 7vw, 50px);
+    letter-spacing: -0.5px;
+    text-transform: uppercase;
+    line-height: 1;
+    margin: 0 0 14px;
+    text-wrap: balance;
+  }
+  .intro {
+    color: var(--paper-dim);
+    font-size: 14px;
+    line-height: 1.6;
+    max-width: 62ch;
+    margin: 0 0 20px;
+  }
+  .intro b { color: var(--paper); font-weight: 600; }
+
+  .arc {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 28px;
+    padding: 10px 14px;
+    background: var(--ink-900);
+    border: 1px solid var(--ink-700);
+    border-radius: 3px;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 12px;
+    color: var(--paper-dim);
+    flex-wrap: wrap;
+  }
+  .arc b { color: var(--good); font-size: 13px; }
+  .arc-arrow { color: var(--ink-600); }
+
+  .stage {
+    background: var(--ink-900);
+    border: 1px solid var(--ink-700);
+    border-radius: 3px;
+    padding: 14px;
+    margin-bottom: 16px;
+    opacity: 0;
+    transform: translateY(8px);
+    animation: rise 0.45s ease forwards;
+  }
+  .stage:nth-of-type(1) { animation-delay: 0.02s; }
+  .stage:nth-of-type(2) { animation-delay: 0.08s; }
+  .stage:nth-of-type(3) { animation-delay: 0.14s; }
+  .stage:nth-of-type(4) { animation-delay: 0.20s; }
+  .stage:nth-of-type(5) { animation-delay: 0.26s; }
+  .stage.solved { border-color: var(--good); }
+  @keyframes rise { to { opacity: 1; transform: translateY(0); } }
+  @media (prefers-reduced-motion: reduce) {
+    .stage { animation: none; opacity: 1; transform: none; }
+  }
+
+  .clip {
+    width: 100%;
+    aspect-ratio: 1400 / 600;
+    background: #05070b;
+    border-radius: 2px;
+    overflow: hidden;
+    border: 1px solid var(--ink-700);
+    margin-bottom: 12px;
+  }
+  .clip img { width: 100%; height: 100%; display: block; object-fit: contain; image-rendering: pixelated; }
+
+  .stage-head { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; margin-bottom: 4px; }
+  .stage-num {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11px;
+    color: var(--ink-600);
+  }
+  .stage.solved .stage-num { color: var(--good); }
+  .stage-title {
+    font-family: "Big Shoulders Display", "Arial Narrow", sans-serif;
+    font-weight: 700;
+    font-size: 20px;
+    letter-spacing: -0.2px;
+    text-transform: uppercase;
+    margin: 0;
+  }
+  .stage-steps {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11.5px;
+    color: var(--paper-dim);
+    display: block;
+    margin-bottom: 8px;
+  }
+  .stage-desc { font-size: 13.5px; color: var(--paper); line-height: 1.55; margin: 0 0 10px; max-width: 64ch; }
+
+  .stat-row { display: flex; align-items: center; gap: 8px; }
+  .stat-pill {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 3px;
+    border: 1px solid;
+    white-space: nowrap;
+  }
+  .stat-pill.zero { border-color: var(--bad); color: var(--bad); }
+  .stat-pill.mid { border-color: var(--accent); color: var(--accent); }
+  .stat-pill.good { border-color: var(--good); color: var(--good); }
+
+  .bar-track {
+    flex: 1;
+    height: 4px;
+    background: var(--ink-700);
+    border-radius: 2px;
+    overflow: hidden;
+    min-width: 60px;
+  }
+  .bar-fill { height: 100%; background: var(--accent); }
+  .bar-fill.good { background: var(--good); }
+  .bar-fill.zero { background: var(--bad); width: 3px !important; }
+
+  .stat-note {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11px;
+    color: var(--paper-dim);
+    display: block;
+    margin-top: 6px;
+  }
+
+  .footer {
+    margin-top: 28px;
+    padding-top: 18px;
+    border-top: 1px solid var(--ink-700);
+    font-size: 13px;
+    color: var(--paper-dim);
+    line-height: 1.6;
+  }
+  .footer p { margin: 0 0 12px; }
+  .footer b { color: var(--paper); }
+</style>
+
+<div class="wrap">
+  <p class="eyebrow">level_1 &middot; PPO, then a fix</p>
+  <h1>Learning to Jump</h1>
+  <p class="intro">
+    Five real playthroughs, pulled straight from the training checkpoints
+    with no edits or speedup. The first four are a PPO agent slowly working
+    out the level from reward alone, and it never gets much past one clear
+    in two. The fifth is a different idea, and it's the one that actually
+    works. <b>Every completion rate below comes from a real batch of
+    evaluation episodes</b>, not just the one clip you're watching.
+  </p>
+
+  <div class="arc">
+    <span>0% <span style="color:var(--ink-600)">(50k steps)</span></span>
+    <span class="arc-arrow">&rarr;</span>
+    <span>20%</span>
+    <span class="arc-arrow">&rarr;</span>
+    <span>30.7%</span>
+    <span class="arc-arrow">&rarr;</span>
+    <span>49.0% <span style="color:var(--ink-600)">(PPO's ceiling)</span></span>
+    <span class="arc-arrow">&rarr;</span>
+    <span><b>100%</b> <span style="color:var(--ink-600)">(solved)</span></span>
+  </div>
+
+  <div class="stage">
+    <div class="clip"><img src="stage1.gif" alt="Checkpoint at 50,000 training steps running straight into the first gap" loading="lazy"></div>
+    <div class="stage-head">
+      <span class="stage-num">01</span>
+      <h2 class="stage-title">Learning the basics</h2>
+    </div>
+    <span class="stage-steps">50,000 training steps</span>
+    <p class="stage-desc">It's figured out that running right is a good idea, but it has no sense of the gap ahead. It just walks straight into it.</p>
+    <div class="stat-row">
+      <span class="stat-pill zero">0% completion</span>
+      <div class="bar-track"><div class="bar-fill zero"></div></div>
+    </div>
+    <span class="stat-note">20-episode stochastic evaluation</span>
+  </div>
+
+  <div class="stage">
+    <div class="clip"><img src="stage2.gif" alt="Checkpoint at 100,000 training steps clearing the level" loading="lazy"></div>
+    <div class="stage-head">
+      <span class="stage-num">02</span>
+      <h2 class="stage-title">Finding the goal</h2>
+    </div>
+    <span class="stage-steps">100,000 training steps</span>
+    <p class="stage-desc">It's started timing jumps correctly, at least sometimes. This clip is a real clear, but at this point it's still failing more often than not.</p>
+    <div class="stat-row">
+      <span class="stat-pill mid">20% completion</span>
+      <div class="bar-track"><div class="bar-fill" style="width:20%"></div></div>
+    </div>
+    <span class="stat-note">20-episode stochastic evaluation</span>
+  </div>
+
+  <div class="stage">
+    <div class="clip"><img src="stage3.gif" alt="Checkpoint at 250,000 training steps clearing the level" loading="lazy"></div>
+    <div class="stage-head">
+      <span class="stage-num">03</span>
+      <h2 class="stage-title">Getting consistent</h2>
+    </div>
+    <span class="stage-steps">250,000 training steps</span>
+    <p class="stage-desc">Clearing the gaps is a real skill now, not a lucky roll. This is measured across a much bigger batch of runs than the earlier stages.</p>
+    <div class="stat-row">
+      <span class="stat-pill mid">30.7% completion</span>
+      <div class="bar-track"><div class="bar-fill" style="width:30.7%"></div></div>
+    </div>
+    <span class="stat-note">150-episode stochastic evaluation</span>
+  </div>
+
+  <div class="stage">
+    <div class="clip"><img src="stage4.gif" alt="Checkpoint at 460,000 training steps reaching the goal" loading="lazy"></div>
+    <div class="stage-head">
+      <span class="stage-num">04</span>
+      <h2 class="stage-title">Plays confidently</h2>
+    </div>
+    <span class="stage-steps">460,000 training steps, the best PPO checkpoint we found</span>
+    <p class="stage-desc">It reaches the goal here. This is its second try in a row, which tracks: at this checkpoint it wins about half the time.</p>
+    <div class="stat-row">
+      <span class="stat-pill good">49.0% completion</span>
+      <div class="bar-track"><div class="bar-fill good" style="width:49%"></div></div>
+    </div>
+    <span class="stat-note">1,000-episode stochastic evaluation</span>
+  </div>
+
+  <div class="stage solved">
+    <div class="clip"><img src="stage5.gif" alt="A policy trained with a memory feature solving the level deterministically" loading="lazy"></div>
+    <div class="stage-head">
+      <span class="stage-num">05</span>
+      <h2 class="stage-title">Solved</h2>
+    </div>
+    <span class="stage-steps">no PPO this time, just direct imitation of a working expert</span>
+    <p class="stage-desc">
+      Turns out PPO's ceiling wasn't a training problem. This level needs a
+      jump at one exact moment after landing, and the agent's view of the
+      world looks almost identical for fifteen ticks on either side of that
+      moment. It couldn't feel time passing. We gave it one feature it
+      tracks itself, ticks since it last touched ground, and had it copy a
+      simple rule-based controller that already solves the level every
+      time. No reward signal needed. That was enough.
+    </p>
+    <div class="stat-row">
+      <span class="stat-pill good">100% det, 97.2% stochastic</span>
+      <div class="bar-track"><div class="bar-fill good" style="width:100%"></div></div>
+    </div>
+    <span class="stat-note">1,000-episode stochastic evaluation, plus 1 deterministic episode (the level and greedy play are both fully deterministic, so one run is conclusive)</span>
+  </div>
+
+  <div class="footer">
+    <p>
+      <b>What actually happened:</b> PPO training, even with expert
+      demonstrations mixed in the whole way through, topped out around a
+      49% success rate per attempt and wouldn't budge past it. Making the
+      policy more confident in its own decisions made it worse, which told
+      us it had never actually found a confident answer, just something
+      that worked often enough. The fix wasn't a better training run. It
+      was noticing the agent literally couldn't sense the one thing this
+      level needed it to sense, and giving it that.
+    </p>
+    <p>
+      Before we found that fix, taking the best of 4 attempts from the
+      strongest PPO checkpoint got us to <b>92.4%</b>, measured directly
+      rather than estimated. That was a reasonable way to work around an
+      unreliable single attempt. Stage 5 doesn't need the workaround
+      anymore.
+    </p>
+  </div>
+</div>
