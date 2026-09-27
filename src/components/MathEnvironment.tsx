@@ -114,15 +114,53 @@ function accuracyAt(xNorm: number) {
   return 81 + sigmoid(xNorm, STEEPNESS, MIDPOINT) * 10
 }
 
-function StaticMarker({ xNorm }: { xNorm: number }) {
+// Dots rendered as HTML circles (not SVG <circle>), positioned by percentage
+// of the container -- the same fix StaticAnnotation already uses for text,
+// for the same reason: preserveAspectRatio="none" stretches the SVG's own
+// coordinate space non-uniformly, which turns a true circle into an ellipse.
+// A percentage-positioned HTML element with border-radius: 50% sits in real
+// screen space instead, so it stays round regardless of the SVG's stretch.
+function Dot({
+  x,
+  y,
+  size,
+  color,
+  opacity,
+}: {
+  x: number
+  y: number
+  size: number
+  color: string
+  opacity: number
+}) {
+  return (
+    <div
+      className="absolute rounded-full"
+      style={{
+        left: `${(x / VIEW_W) * 100}%`,
+        top: `${(y / VIEW_H) * 100}%`,
+        width: size,
+        height: size,
+        background: color,
+        opacity,
+        transform: 'translate(-50%, -50%)',
+      }}
+    />
+  )
+}
+
+function StaticTangentLine({ xNorm }: { xNorm: number }) {
+  const t = tangentEndpoints(xNorm)
+  return <line x1={t.x1} y1={t.y1} x2={t.x2} y2={t.y2} stroke="var(--color-accent)" strokeWidth={1.25} opacity={0.45} />
+}
+
+function StaticMarkerDots({ xNorm }: { xNorm: number }) {
   const { x, y } = curvePoint(xNorm, CURVE_TOP, CURVE_BOTTOM, STEEPNESS, MIDPOINT)
   const { y: y2 } = curvePoint(xNorm, CURVE2_TOP, CURVE2_BOTTOM, STEEPNESS_2, MIDPOINT_2)
-  const t = tangentEndpoints(xNorm)
   return (
     <>
-      <line x1={t.x1} y1={t.y1} x2={t.x2} y2={t.y2} stroke="var(--color-accent)" strokeWidth={1.25} opacity={0.45} />
-      <circle cx={x} cy={y} r={5} fill="var(--color-accent)" opacity={0.9} />
-      <circle cx={x} cy={y2} r={3} fill="var(--color-paper-dim)" opacity={0.55} />
+      <Dot x={x} y={y} size={10} color="var(--color-accent)" opacity={0.9} />
+      <Dot x={x} y={y2} size={6} color="var(--color-paper-dim)" opacity={0.55} />
     </>
   )
 }
@@ -160,20 +198,51 @@ function TrackedAnnotation({ smoothX }: { smoothX: ReturnType<typeof useSpring> 
   )
 }
 
-function TrackedMarkers({ smoothX }: { smoothX: ReturnType<typeof useSpring> }) {
-  const cx = useTransform(smoothX, (t) => curvePoint(t, CURVE_TOP, CURVE_BOTTOM, STEEPNESS, MIDPOINT).x)
-  const cy = useTransform(smoothX, (t) => curvePoint(t, CURVE_TOP, CURVE_BOTTOM, STEEPNESS, MIDPOINT).y)
-  const cy2 = useTransform(smoothX, (t) => curvePoint(t, CURVE2_TOP, CURVE2_BOTTOM, STEEPNESS_2, MIDPOINT_2).y)
+function TrackedTangentLine({ smoothX }: { smoothX: ReturnType<typeof useSpring> }) {
   const x1 = useTransform(smoothX, (t) => tangentEndpoints(t).x1)
   const y1 = useTransform(smoothX, (t) => tangentEndpoints(t).y1)
   const x2 = useTransform(smoothX, (t) => tangentEndpoints(t).x2)
   const y2 = useTransform(smoothX, (t) => tangentEndpoints(t).y2)
+  return <motion.line x1={x1} y1={y1} x2={x2} y2={y2} stroke="var(--color-accent)" strokeWidth={1.25} opacity={0.45} />
+}
 
+// Same HTML-circle fix as the static Dot above, animated: left/top track
+// the spring-smoothed cursor position as percentages, so the marker stays a
+// true circle at every frame instead of an SVG ellipse.
+function TrackedDot({
+  smoothX,
+  top,
+  bottom,
+  steep,
+  mid,
+  size,
+  color,
+  opacity,
+}: {
+  smoothX: ReturnType<typeof useSpring>
+  top: number
+  bottom: number
+  steep: number
+  mid: number
+  size: number
+  color: string
+  opacity: number
+}) {
+  const left = useTransform(smoothX, (t) => `${(curvePoint(t, top, bottom, steep, mid).x / VIEW_W) * 100}%`)
+  const topPct = useTransform(smoothX, (t) => `${(curvePoint(t, top, bottom, steep, mid).y / VIEW_H) * 100}%`)
+  return (
+    <motion.div
+      className="absolute rounded-full"
+      style={{ left, top: topPct, width: size, height: size, background: color, opacity, transform: 'translate(-50%, -50%)' }}
+    />
+  )
+}
+
+function TrackedMarkerDots({ smoothX }: { smoothX: ReturnType<typeof useSpring> }) {
   return (
     <>
-      <motion.line x1={x1} y1={y1} x2={x2} y2={y2} stroke="var(--color-accent)" strokeWidth={1.25} opacity={0.45} />
-      <motion.circle cx={cx} cy={cy} r={5} fill="var(--color-accent)" opacity={0.9} />
-      <motion.circle cx={cx} cy={cy2} r={3} fill="var(--color-paper-dim)" opacity={0.55} />
+      <TrackedDot smoothX={smoothX} top={CURVE_TOP} bottom={CURVE_BOTTOM} steep={STEEPNESS} mid={MIDPOINT} size={10} color="var(--color-accent)" opacity={0.9} />
+      <TrackedDot smoothX={smoothX} top={CURVE2_TOP} bottom={CURVE2_BOTTOM} steep={STEEPNESS_2} mid={MIDPOINT_2} size={6} color="var(--color-paper-dim)" opacity={0.55} />
     </>
   )
 }
@@ -214,22 +283,23 @@ export default function MathEnvironment({
         <line x1={0} y1={AXIS_Y} x2={VIEW_W} y2={AXIS_Y} stroke="var(--color-paper-dim)" strokeWidth={1} opacity={0.2} />
 
         <path d={STEP_PATH} fill="none" stroke="var(--color-ink-600)" strokeWidth={1} opacity={0.32} />
-        {STEP_POINTS.map((p, i) => (
-          <circle
-            key={`step-${i}`}
-            cx={p.x}
-            cy={p.y}
-            r={i === STEP_POINTS.length - 1 ? 3.5 : 2}
-            fill={i === STEP_POINTS.length - 1 ? 'var(--color-accent)' : 'var(--color-ink-600)'}
-            opacity={i === STEP_POINTS.length - 1 ? 0.65 : 0.45}
-          />
-        ))}
 
         <path d={CURVE2_PATH} fill="none" stroke="var(--color-paper-dim)" strokeWidth={1} strokeDasharray="4 7" opacity={0.16} />
         <path d={CURVE_PATH} fill="none" stroke="var(--color-accent)" strokeWidth={2} opacity={0.4} />
 
-        {!prefersReducedMotion && active ? <TrackedMarkers smoothX={smoothX} /> : <StaticMarker xNorm={0.5} />}
+        {!prefersReducedMotion && active ? <TrackedTangentLine smoothX={smoothX} /> : <StaticTangentLine xNorm={0.5} />}
       </svg>
+      {STEP_POINTS.map((p, i) => (
+        <Dot
+          key={`step-${i}`}
+          x={p.x}
+          y={p.y}
+          size={i === STEP_POINTS.length - 1 ? 7 : 4}
+          color={i === STEP_POINTS.length - 1 ? 'var(--color-accent)' : 'var(--color-ink-600)'}
+          opacity={i === STEP_POINTS.length - 1 ? 0.65 : 0.45}
+        />
+      ))}
+      {!prefersReducedMotion && active ? <TrackedMarkerDots smoothX={smoothX} /> : <StaticMarkerDots xNorm={0.5} />}
       {!prefersReducedMotion && active ? (
         <TrackedAnnotation smoothX={smoothX} />
       ) : (
