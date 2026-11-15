@@ -34,6 +34,17 @@ export const projects: Project[] = [
     link: 'https://codelens-web-pi.vercel.app',
   },
   {
+    title: 'Thyrd',
+    code: 'Social Events Platform · Founder',
+    description:
+      'A social events app for UW students: find something going on around campus or Seattle, then post a plan and let other Huskies join. An ingestion pipeline pulls five sources (UW calendars, HuskyLink student orgs, Husky Athletics, venue iCal feeds, and Ticketmaster) into 130+ upcoming events on scheduled cron jobs, with idempotent upserts, stale-event pruning, and each source isolated so one broken feed never touches the others. Sign-in is limited to UW email, and the social side has friends, plan threads, time polls, email and web push notifications, and two-way blocking with report-based moderation.',
+    tags: ['Next.js', 'TypeScript', 'PostgreSQL', 'Neon', 'Web Push'],
+    statNumber: 183,
+    statSuffix: ' Tests',
+    link: 'https://thyrd-theta.vercel.app/',
+    linkLabel: 'Live site',
+  },
+  {
     title: 'GymBud',
     code: 'iOS · Founder & Developer',
     description:

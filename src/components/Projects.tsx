@@ -9,10 +9,12 @@ import GymBudArtifact from './projects/GymBudArtifact'
 import AlgoverseArtifact from './projects/AlgoverseArtifact'
 import DubHacksArtifact from './projects/DubHacksArtifact'
 import PlatformerArtifact from './projects/PlatformerArtifact'
+import ThyrdArtifact from './projects/ThyrdArtifact'
 
 const platformer = projects.find((p) => p.title === 'Learning to Jump')!
 const codelens = projects.find((p) => p.title === 'Codelens')!
 const gymbud = projects.find((p) => p.title === 'GymBud')!
+const thyrd = projects.find((p) => p.title === 'Thyrd')!
 const dubhacks = projects.find((p) => p.title === 'T-Mobile AI Pricing Assistant')!
 const algoverse = experience.find((e) => e.company === 'Algoverse AI Research')!
 
@@ -192,6 +194,18 @@ export default function Projects() {
         />
         <ExhibitItem
           className="lg:col-span-7 lg:col-start-1 lg:mt-8"
+          artifact={<ThyrdArtifact />}
+          eyebrow={thyrd.code}
+          title={thyrd.title}
+          description={thyrd.description}
+          tags={thyrd.tags}
+          statText="183 Tests"
+          link={thyrd.link}
+          linkLabel={thyrd.linkLabel}
+          delay={0.24}
+        />
+        <ExhibitItem
+          className="lg:col-span-4 lg:col-start-9 lg:mt-24"
           artifact={<DubHacksArtifact />}
           eyebrow={dubhacks.code}
           title={dubhacks.title}
