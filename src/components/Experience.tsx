@@ -3,6 +3,7 @@ import { experience, type ExperienceEntry } from '../data/experience'
 import Eyebrow from './Eyebrow'
 import MaskReveal from './MaskReveal'
 import Tag from './Tag'
+import StarTrackerFigure from './StarTrackerFigure'
 
 // Process facts, not outcome facts — Projects' Fig. 1 artifact already
 // carries the accuracy/F1 result, so this ledger is free to describe
@@ -191,10 +192,80 @@ function HandshakeEntry({ entry, prefersReducedMotion }: { entry: ExperienceEntr
   )
 }
 
+// Numbers from the QUEST fix and its test suite, as stated in the
+// description, nothing derived.
+const HSL_LEDGER = [
+  { value: '55→0%', label: 'QUEST failure rate' },
+  { value: '500', label: 'Randomized test scenes' },
+  { value: '0.01', label: 'Radian tolerance' },
+]
+
+function HuskySatEntry({ entry, prefersReducedMotion }: { entry: ExperienceEntry; prefersReducedMotion: boolean }) {
+  return (
+    <motion.div
+      className="grid grid-cols-1 gap-x-8 gap-y-10 border-t border-ink-800 pt-16 lg:col-span-12 lg:grid-cols-12"
+      initial={prefersReducedMotion ? undefined : { opacity: 0, y: 32 }}
+      whileInView={prefersReducedMotion ? undefined : { opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '-100px' }}
+      transition={{ type: 'spring', stiffness: 120, damping: 18 }}
+    >
+      <div className="lg:col-span-5">
+        <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+          <span className="font-mono text-xs tracking-wide text-paper-dim tabular uppercase">{entry.dates}</span>
+          {entry.stat && (
+            <span className="font-mono text-[0.625rem] tracking-[0.14em] text-accent uppercase">{entry.stat}</span>
+          )}
+        </div>
+        <h3 className="mt-2 font-display text-4xl leading-[0.95] font-bold uppercase tracking-tight text-paper sm:text-5xl">
+          {entry.company}
+        </h3>
+        <p className="mt-2 text-sm font-medium text-accent">
+          {entry.role} <span className="text-paper-dim">· {entry.code}</span>
+        </p>
+        <p className="mt-4 text-sm leading-relaxed text-paper-dim">{entry.description}</p>
+
+        <div className="mt-8 grid grid-cols-3 gap-x-6 border-t border-ink-800 pt-6">
+          {HSL_LEDGER.map((item) => (
+            <div key={item.label}>
+              <p className="font-display text-3xl font-bold tabular text-paper">{item.value}</p>
+              <p className="font-mono text-[0.625rem] tracking-[0.1em] text-paper-dim uppercase">{item.label}</p>
+            </div>
+          ))}
+        </div>
+
+        {entry.link && (
+          <a
+            href={entry.link}
+            target="_blank"
+            rel="noreferrer"
+            className="link-underline mt-6 inline-flex items-center gap-1.5 font-mono text-[0.6875rem] font-medium tracking-wide text-accent uppercase transition-colors hover:text-paper"
+          >
+            {entry.linkLabel ?? 'Visit'}
+            <span aria-hidden="true" className="text-[0.625rem]">
+              ↗
+            </span>
+          </a>
+        )}
+
+        <ul className="mt-6 flex flex-wrap gap-x-5 gap-y-2">
+          {entry.tags.map((tag, index) => (
+            <Tag key={tag} label={tag} delay={index * 30} />
+          ))}
+        </ul>
+      </div>
+
+      <div className="lg:col-span-7">
+        <StarTrackerFigure />
+      </div>
+    </motion.div>
+  )
+}
+
 export default function Experience() {
   const prefersReducedMotion = Boolean(useReducedMotion())
   const algoverse = experience.find((e) => e.company === 'Algoverse AI Research')!
   const handshake = experience.find((e) => e.company === 'Handshake')!
+  const huskySat = experience.find((e) => e.company === 'Husky Satellite Lab')!
 
   return (
     <section id="experience" className="relative mx-auto max-w-6xl px-6 py-28 sm:px-8 lg:px-12">
@@ -208,6 +279,7 @@ export default function Experience() {
       <div className="mt-16 grid grid-cols-1 gap-x-8 gap-y-16 lg:grid-cols-12">
         <AlgoverseEntry entry={algoverse} prefersReducedMotion={prefersReducedMotion} />
         <HandshakeEntry entry={handshake} prefersReducedMotion={prefersReducedMotion} />
+        <HuskySatEntry entry={huskySat} prefersReducedMotion={prefersReducedMotion} />
       </div>
     </section>
   )

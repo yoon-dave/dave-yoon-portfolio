@@ -13,6 +13,18 @@ export interface ExperienceEntry {
 
 export const experience: ExperienceEntry[] = [
   {
+    company: 'Husky Satellite Lab',
+    location: 'Seattle, WA',
+    role: 'Software Engineer',
+    code: 'Star Tracker Subsystem (LOST)',
+    dates: 'October 2026 – Present',
+    description:
+      "I work on LOST, the lab's open-source C++ star tracker, which finds stars in a camera image, matches them against a catalog, and works out which way the spacecraft is pointing. QUEST, one of its attitude estimators, was failing on 55% of randomized star scenes. I traced that to unnormalized camera vectors sending its Newton-Raphson solver to the wrong root, and after the fix it failed on none of 500. I also bounded the solver to stop a float-mode infinite hang, and built a 500-scene randomized test suite that checks QUEST and DQM to within 0.01 rad in both float and double precision. To validate it for the OreSat and HS-2 CubeSat missions, I deployed LOST to a BeagleBone Black (1 GHz ARM) and ran star identification end to end.",
+    tags: ['C++', 'Embedded Linux', 'Attitude Estimation', 'Unit Testing'],
+    link: 'https://huskysat.org/',
+    linkLabel: 'Husky Satellite Lab',
+  },
+  {
     company: 'Algoverse AI Research',
     location: 'Remote',
     role: 'AI Research Prompt Engineer',
