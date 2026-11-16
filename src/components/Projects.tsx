@@ -48,7 +48,7 @@ function ExhibitItem({
       viewport={{ once: true, margin: '-100px' }}
       transition={{ type: 'spring', stiffness: 120, damping: 17, delay }}
     >
-      <div className="flex [&>*]:h-full [&>*]:w-full [&>*]:max-w-none">{artifact}</div>
+      <div className="flex [&>*]:w-full [&>*]:max-w-none">{artifact}</div>
       <div>
         <span className="eyebrow">{eyebrow}</span>
         <h3
@@ -96,66 +96,71 @@ export default function Projects() {
           Projects
         </h2>
 
-        {/* Even grid, two per row. Each card spans two subgrid rows (artifact, text),
-            so artifacts in a row share a height and the titles line up. */}
+        {/* Two columns for five projects: three on the left, two on the
+            right, with the right column centered vertically so the cards
+            interlock instead of leaving one alone on the last row. */}
         <div className="relative mt-14 grid grid-cols-1 gap-x-8 gap-y-16 md:grid-cols-2 lg:gap-x-12">
-          <ExhibitItem
-            className="grid grid-rows-subgrid row-span-2 gap-6"
-            artifact={<ThyrdArtifact />}
-            eyebrow={thyrd.code}
-            title={thyrd.title}
-            description={thyrd.description}
-            tags={thyrd.tags}
-            statText="183 Tests"
-            link={thyrd.link}
-            linkLabel={thyrd.linkLabel}
-            delay={0}
-          />
-          <ExhibitItem
-            className="grid grid-rows-subgrid row-span-2 gap-6"
-            artifact={<CodelensArtifact />}
-            eyebrow={codelens.code}
-            title={codelens.title}
-            description={codelens.description}
-            tags={codelens.tags}
-            statText="150+ Tests"
-            link={codelens.link}
-            linkLabel="Live site"
-            delay={0}
-          />
-          <ExhibitItem
-            className="grid grid-rows-subgrid row-span-2 gap-6"
-            artifact={<PlatformerArtifact />}
-            eyebrow={platformer.code}
-            title={platformer.title}
-            description={platformer.description}
-            tags={platformer.tags}
-            statText="100% Solved"
-            link={platformer.link}
-            linkLabel={platformer.linkLabel}
-            delay={0}
-          />
-          <ExhibitItem
-            className="grid grid-rows-subgrid row-span-2 gap-6"
-            artifact={<GymBudArtifact />}
-            eyebrow={gymbud.code}
-            title={gymbud.title}
-            description={gymbud.description}
-            tags={gymbud.tags}
-            link={gymbud.link}
-            linkLabel={gymbud.linkLabel}
-            delay={0}
-          />
-          <ExhibitItem
-            className="grid grid-rows-subgrid row-span-2 gap-6"
-            artifact={<DubHacksArtifact />}
-            eyebrow={dubhacks.code}
-            title={dubhacks.title}
-            description={dubhacks.description}
-            tags={dubhacks.tags}
-            statText="3rd Place"
-            delay={0}
-          />
+          <div className="flex flex-col gap-16">
+            <ExhibitItem
+              className="flex flex-col gap-6"
+              artifact={<ThyrdArtifact />}
+              eyebrow={thyrd.code}
+              title={thyrd.title}
+              description={thyrd.description}
+              tags={thyrd.tags}
+              statText="183 Tests"
+              link={thyrd.link}
+              linkLabel={thyrd.linkLabel}
+              delay={0}
+            />
+            <ExhibitItem
+              className="flex flex-col gap-6"
+              artifact={<PlatformerArtifact />}
+              eyebrow={platformer.code}
+              title={platformer.title}
+              description={platformer.description}
+              tags={platformer.tags}
+              statText="100% Solved"
+              link={platformer.link}
+              linkLabel={platformer.linkLabel}
+              delay={0}
+            />
+            <ExhibitItem
+              className="flex flex-col gap-6"
+              artifact={<DubHacksArtifact />}
+              eyebrow={dubhacks.code}
+              title={dubhacks.title}
+              description={dubhacks.description}
+              tags={dubhacks.tags}
+              statText="3rd Place"
+              delay={0}
+            />
+          </div>
+          <div className="flex flex-col gap-16 md:self-center">
+            <ExhibitItem
+              className="flex flex-col gap-6"
+              artifact={<CodelensArtifact />}
+              eyebrow={codelens.code}
+              title={codelens.title}
+              description={codelens.description}
+              tags={codelens.tags}
+              statText="150+ Tests"
+              link={codelens.link}
+              linkLabel="Live site"
+              delay={0}
+            />
+            <ExhibitItem
+              className="flex flex-col gap-6"
+              artifact={<GymBudArtifact />}
+              eyebrow={gymbud.code}
+              title={gymbud.title}
+              description={gymbud.description}
+              tags={gymbud.tags}
+              link={gymbud.link}
+              linkLabel={gymbud.linkLabel}
+              delay={0}
+            />
+          </div>
         </div>
 
         <p className="relative mt-24 text-xs text-paper-dim/60">

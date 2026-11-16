@@ -145,7 +145,7 @@ function AlgoverseEntry({ entry, prefersReducedMotion }: { entry: ExperienceEntr
       </div>
 
       <p className="mt-6 max-w-xl border-l-2 border-accent pl-4 text-sm leading-relaxed text-paper-dim">
-        A <span className="font-medium text-paper">"suspicious-first" heuristic</span> I devised for reading a
+        A <span className="font-medium text-paper">“suspicious-first” heuristic</span> I devised for reading a
         page’s structure before its content carried accuracy from 81% to 91%.
       </p>
 

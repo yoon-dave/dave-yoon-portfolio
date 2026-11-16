@@ -23,10 +23,10 @@ export default function CodelensArtifact() {
       </p>
       <div className="mt-4 space-y-1 border-t border-ink-800 pt-3 text-[0.75rem]">
         <p className="text-paper-dim/70">
-          <span className="text-paper-dim/40">− </span>const scope = 'repo'
+          <span className="text-paper-dim/40">− </span>const scope = ‘repo’
         </p>
         <p className="text-accent">
-          <span className="text-accent/50">+ </span>const scope = 'repo:read'
+          <span className="text-accent/50">+ </span>const scope = ‘repo:read’
         </p>
       </div>
     </div>
