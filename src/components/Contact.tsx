@@ -1,6 +1,4 @@
 import { useState, type FormEvent } from 'react'
-import Eyebrow from './Eyebrow'
-import CircleReveal from './CircleReveal'
 
 const CONTACT_EMAIL = 'dgyoon@cs.washington.edu'
 const CONTACT_PHONE = '(425) 365-2019'
@@ -11,7 +9,7 @@ const LINKEDIN_URL = 'https://www.linkedin.com/in/dgyoon/'
 const fieldClass =
   'peer w-full border-b border-ink-700 bg-transparent px-0 pt-5 pb-2 text-sm text-paper outline-none transition-colors focus:border-accent'
 const labelClass =
-  'pointer-events-none absolute left-0 top-3.5 font-mono text-xs tracking-wide text-paper-dim uppercase transition-all duration-200 peer-focus:top-0 peer-focus:text-[0.6875rem] peer-focus:text-accent peer-[&:not(:placeholder-shown)]:top-0 peer-[&:not(:placeholder-shown)]:text-[0.6875rem]'
+  'pointer-events-none absolute left-0 top-3.5 text-xs text-paper-dim transition-all duration-200 peer-focus:top-0 peer-focus:text-[0.6875rem] peer-focus:text-accent peer-[&:not(:placeholder-shown)]:top-0 peer-[&:not(:placeholder-shown)]:text-[0.6875rem]'
 
 type SubmitStatus = 'idle' | 'sending' | 'success' | 'error'
 
@@ -67,15 +65,12 @@ export default function Contact() {
 
   return (
     <section id="contact" className="relative mx-auto max-w-6xl px-6 py-28 sm:px-8 lg:px-12">
-      <Eyebrow>Reach</Eyebrow>
-      <CircleReveal className="mt-6 max-w-2xl">
-        <p className="font-display text-3xl leading-[1.2] font-bold text-paper sm:text-4xl">
-          Based in Sammamish, WA. Have a project in mind or just want to
-          say hi?
-        </p>
-      </CircleReveal>
+      <h2 className="font-display text-3xl font-semibold tracking-tight text-paper sm:text-4xl">Say hi</h2>
+      <p className="mt-4 max-w-xl text-base leading-relaxed text-paper-dim">
+        I’m looking for a Summer 2027 internship in software engineering, backend systems, or AI/ML. If you’re working on something interesting, I’d love to hear about it.
+      </p>
       <p className="mt-4 max-w-md text-base leading-relaxed text-paper-dim">
-        Fill out the form and it'll land straight in my inbox.
+        This form goes straight to my inbox.
       </p>
 
       <form onSubmit={handleSubmit} className="mt-10 flex max-w-xl flex-col gap-7">
@@ -125,24 +120,24 @@ export default function Contact() {
           <button
             type="submit"
             disabled={status === 'sending'}
-            className="w-fit rounded-[3px] bg-paper px-6 py-3 font-mono text-xs font-medium tracking-[0.08em] text-ink-950 uppercase transition-colors duration-200 hover:bg-accent disabled:cursor-not-allowed disabled:opacity-60"
+            className="w-fit rounded-[3px] bg-paper px-6 py-3 text-xs font-medium text-ink-950 transition-colors duration-200 hover:bg-accent disabled:cursor-not-allowed disabled:opacity-60"
           >
             {status === 'sending' ? 'Sending…' : 'Send message'}
           </button>
           {status === 'success' && (
-            <span className="font-mono text-xs text-paper-dim">
-              Message sent — I'll get back to you soon.
+            <span className="text-xs text-paper-dim">
+              Message sent — I’ll get back to you soon.
             </span>
           )}
           {status === 'error' && (
-            <span className="font-mono text-xs text-accent">
+            <span className="text-xs text-accent">
               Something went wrong. Try emailing me directly instead.
             </span>
           )}
         </div>
       </form>
 
-      <div className="mt-14 flex flex-wrap items-center gap-x-8 gap-y-3 border-t border-ink-800 pt-8 font-mono text-xs tracking-wide text-paper-dim uppercase">
+      <div className="mt-14 flex flex-wrap items-center gap-x-8 gap-y-3 border-t border-ink-800 pt-8 text-xs text-paper-dim">
         <CopyableLink value={CONTACT_EMAIL} href={`mailto:${CONTACT_EMAIL}`} display={CONTACT_EMAIL} />
         <CopyableLink value={CONTACT_PHONE} href={`tel:${CONTACT_PHONE_TEL}`} display={CONTACT_PHONE} />
         <a

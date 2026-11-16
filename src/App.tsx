@@ -5,27 +5,25 @@ import Projects from './components/Projects'
 import Experience from './components/Experience'
 import Education from './components/Education'
 import Contact from './components/Contact'
-import ScrollProgress from './components/ScrollProgress'
 import ScrollToTop from './components/ScrollToTop'
-import TitleBlock from './components/TitleBlock'
-import NextSection from './components/NextSection'
+import DotGrid from './components/DotGrid'
 
 function App() {
   return (
-    <MotionConfig reducedMotion="user">
+    // "always" turns off the slide/scale entrance animations site-wide;
+    // opacity fades and the interactive figures still work.
+    <MotionConfig reducedMotion="always">
       <div className="relative min-h-svh bg-ink-950 text-paper">
-        <ScrollProgress />
+        <DotGrid />
         <main className="relative z-10">
           <Hero />
-          <About />
-          <Education />
           <Experience />
           <Projects />
+          <About />
+          <Education />
           <Contact />
         </main>
-        <TitleBlock />
         <ScrollToTop />
-        <NextSection />
       </div>
     </MotionConfig>
   )

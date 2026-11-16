@@ -15,7 +15,7 @@ export const education: EducationEntry[] = [
     detail: 'B.S. Computer Science, Minor in Business Administration — GPA 3.98/4.00',
     dates: 'September 2025 to June 2028',
     coursework:
-      'Linear Algebra, Foundations of Computing (CSE 311), Software Design & Implementation (CSE 331), Hardware/Software Interface (CSE 351)',
+      'Software Design & Implementation, Hardware/Software Interface, Foundations of Computing, Data Structures & Parallelism, Systems Programming, Computer Security, Matrix Algebra, Essentials of Management and Entrepreneurship',
   },
   {
     school: 'Skyline High School',

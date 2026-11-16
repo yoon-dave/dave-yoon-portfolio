@@ -1,6 +1,5 @@
 import { motion, useReducedMotion } from 'motion/react'
 import { experience, type ExperienceEntry } from '../data/experience'
-import Eyebrow from './Eyebrow'
 import MaskReveal from './MaskReveal'
 import Tag from './Tag'
 import StarTrackerFigure from './StarTrackerFigure'
@@ -8,7 +7,7 @@ import StarTrackerFigure from './StarTrackerFigure'
 // Process facts, not outcome facts — Projects' Fig. 1 artifact already
 // carries the accuracy/F1 result, so this ledger is free to describe
 // the work that produced it: real counts pulled straight from the
-// entry's own description, not re-derived or invented.
+// entry’s own description, not re-derived or invented.
 const ALGOVERSE_LEDGER = [
   { value: '05', label: 'Iteration rounds' },
   { value: '600', label: 'Sample dataset' },
@@ -16,7 +15,7 @@ const ALGOVERSE_LEDGER = [
   { value: '02', label: 'Workshops accepted' },
 ]
 
-// The paper's actual method comparison (arXiv:2507.13357, Fig. 2): F1
+// The paper’s actual method comparison (arXiv:2507.13357, Fig. 2): F1
 // per model across baseline, the two 8/10-shot prompting techniques the
 // paper names MWA and USA, and their combination. n=600 matches the
 // 311 curated benign + 289 phishing brands the paper evaluates on.
@@ -33,7 +32,7 @@ function barHeight(f1: number) {
 }
 
 // Byline in real citation order (first four authors, then et al.) — the
-// same shorthand a reader would see on the paper's own venue listing.
+// same shorthand a reader would see on the paper’s own venue listing.
 const PAPER_TITLE =
   'Adaptive Linguistic Prompting (ALP) Enhances Phishing Webpage Detection in Multimodal Large Language Models'
 const PAPER_BYLINE = 'Bhargude, Gonehal, Haney, Yoon, et al.'
@@ -43,19 +42,19 @@ function PaperFigure({ link, linkLabel }: { link?: string; linkLabel?: string })
     <div className="w-full max-w-xl border border-ink-700 bg-ink-900 shadow-[6px_6px_0_0_var(--color-ink-800)]">
       <div className="flex flex-col gap-4 border-b border-ink-800 p-6 pb-5 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <span className="font-mono text-[0.625rem] tracking-[0.14em] text-paper-dim uppercase">
+          <span className="text-[0.625rem] text-paper-dim">
             Published research
           </span>
           <p className="mt-2 max-w-md font-sans text-lg leading-snug text-paper sm:text-xl">{PAPER_TITLE}</p>
-          <p className="mt-2 font-mono text-[0.625rem] tracking-wide text-paper-dim uppercase">{PAPER_BYLINE}</p>
+          <p className="mt-2 text-[0.625rem] text-paper-dim">{PAPER_BYLINE}</p>
         </div>
-        <span className="inline-flex w-fit shrink-0 rounded-[3px] border border-accent/50 px-2 py-1 font-mono text-[0.5625rem] tracking-[0.12em] text-accent uppercase">
+        <span className="inline-flex w-fit shrink-0 rounded-[3px] border border-accent/50 px-2 py-1 text-[0.5625rem] text-accent">
           NLP4PI 2025
         </span>
       </div>
 
       <figure className="p-6">
-        <figcaption className="font-mono text-[0.625rem] tracking-[0.12em] text-paper-dim uppercase">
+        <figcaption className="text-[0.625rem] text-paper-dim">
           Fig. 2 · F1 by method (n=600)
         </figcaption>
 
@@ -64,30 +63,30 @@ function PaperFigure({ link, linkLabel }: { link?: string; linkLabel?: string })
             <div key={row.method} className="flex flex-col items-center gap-2">
               <div className="flex items-end gap-2">
                 <div className="flex flex-col items-center gap-1.5">
-                  <span className="font-mono text-[0.5625rem] tabular text-accent">{row.gpt4o.toFixed(2)}</span>
+                  <span className="text-[0.5625rem] tabular text-accent">{row.gpt4o.toFixed(2)}</span>
                   <div className="flex h-28 w-3.5 items-end bg-ink-800">
                     <div className="w-full bg-accent" style={{ height: `${barHeight(row.gpt4o)}%` }} />
                   </div>
                 </div>
                 <div className="flex flex-col items-center gap-1.5">
-                  <span className="font-mono text-[0.5625rem] tabular text-paper-dim">{row.gemini.toFixed(2)}</span>
+                  <span className="text-[0.5625rem] tabular text-paper-dim">{row.gemini.toFixed(2)}</span>
                   <div className="flex h-28 w-3.5 items-end bg-ink-800">
                     <div className="w-full bg-paper-dim/50" style={{ height: `${barHeight(row.gemini)}%` }} />
                   </div>
                 </div>
               </div>
-              <span className="font-mono text-[0.5625rem] tracking-wide text-paper-dim uppercase">{row.method}</span>
+              <span className="text-[0.5625rem] text-paper-dim">{row.method}</span>
             </div>
           ))}
         </div>
 
         <div className="mt-6 flex flex-wrap items-center justify-between gap-x-4 gap-y-3 border-t border-ink-800 pt-4">
           <div className="flex items-center gap-4">
-            <span className="flex items-center gap-1.5 font-mono text-[0.5625rem] text-paper-dim uppercase">
+            <span className="flex items-center gap-1.5 text-[0.5625rem] text-paper-dim">
               <span aria-hidden="true" className="h-1.5 w-1.5 bg-accent" />
               GPT-4o
             </span>
-            <span className="flex items-center gap-1.5 font-mono text-[0.5625rem] text-paper-dim uppercase">
+            <span className="flex items-center gap-1.5 text-[0.5625rem] text-paper-dim">
               <span aria-hidden="true" className="h-1.5 w-1.5 bg-paper-dim/50" />
               Gemini 1.5 Pro
             </span>
@@ -97,7 +96,7 @@ function PaperFigure({ link, linkLabel }: { link?: string; linkLabel?: string })
               href={link}
               target="_blank"
               rel="noreferrer"
-              className="link-underline inline-flex items-center gap-1.5 font-mono text-[0.6875rem] font-medium tracking-wide text-accent uppercase transition-colors hover:text-paper"
+              className="link-underline inline-flex items-center gap-1.5 text-[0.6875rem] font-medium text-accent transition-colors hover:text-paper"
             >
               {linkLabel ?? 'Read Paper'}
               <span aria-hidden="true" className="text-[0.625rem]">
@@ -121,12 +120,12 @@ function AlgoverseEntry({ entry, prefersReducedMotion }: { entry: ExperienceEntr
       transition={{ type: 'spring', stiffness: 120, damping: 18 }}
     >
       <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
-        <span className="font-mono text-xs tracking-wide text-paper-dim tabular uppercase">{entry.dates}</span>
+        <span className="text-xs text-paper-dim tabular">{entry.dates}</span>
         {entry.stat && (
-          <span className="font-mono text-[0.625rem] tracking-[0.14em] text-accent uppercase">{entry.stat}</span>
+          <span className="text-[0.625rem] text-accent">{entry.stat}</span>
         )}
       </div>
-      <h3 className="mt-2 font-display text-4xl leading-[0.95] font-bold uppercase tracking-tight text-paper sm:text-6xl">
+      <h3 className="mt-2 font-display text-4xl leading-[0.95] font-semibold tracking-tight text-paper sm:text-4xl">
         {entry.company}
       </h3>
       <p className="mt-2 text-sm font-medium text-accent">{entry.role}</p>
@@ -139,15 +138,15 @@ function AlgoverseEntry({ entry, prefersReducedMotion }: { entry: ExperienceEntr
       <div className="mt-8 flex flex-wrap gap-x-10 gap-y-5 border-t border-ink-800 pt-6">
         {ALGOVERSE_LEDGER.map((item) => (
           <div key={item.label}>
-            <p className="font-display text-3xl font-bold tabular text-paper">{item.value}</p>
-            <p className="font-mono text-[0.625rem] tracking-[0.1em] text-paper-dim uppercase">{item.label}</p>
+            <p className="font-display text-3xl font-semibold tabular text-paper">{item.value}</p>
+            <p className="text-[0.625rem] text-paper-dim">{item.label}</p>
           </div>
         ))}
       </div>
 
       <p className="mt-6 max-w-xl border-l-2 border-accent pl-4 text-sm leading-relaxed text-paper-dim">
         A <span className="font-medium text-paper">"suspicious-first" heuristic</span> I devised for reading a
-        page's structure before its content carried accuracy from 81% to 91%.
+        page’s structure before its content carried accuracy from 81% to 91%.
       </p>
 
       <ul className="mt-6 flex flex-wrap gap-x-5 gap-y-2">
@@ -168,17 +167,17 @@ function HandshakeEntry({ entry, prefersReducedMotion }: { entry: ExperienceEntr
       viewport={{ once: true, margin: '-100px' }}
       transition={{ type: 'spring', stiffness: 120, damping: 18, delay: 0.1 }}
     >
-      <span className="font-mono text-xs tracking-wide text-paper-dim tabular uppercase">{entry.dates}</span>
+      <span className="text-xs text-paper-dim tabular">{entry.dates}</span>
       <p className="mt-2 text-lg font-semibold text-accent sm:text-xl">{entry.role}</p>
-      <h3 className="mt-1 font-display text-2xl font-bold uppercase tracking-tight text-paper sm:text-3xl">
+      <h3 className="mt-1 font-display text-2xl font-semibold tracking-tight text-paper sm:text-3xl">
         {entry.company}
       </h3>
       <p className="mt-3 text-sm leading-relaxed text-paper-dim">{entry.description}</p>
 
       <div className="mt-6">
-        <span className="font-display text-2xl font-bold tabular text-accent">{entry.stat}</span>
+        <span className="font-display text-2xl font-semibold tabular text-accent">{entry.stat}</span>
         <div className="mt-2 h-px w-full bg-accent/30" aria-hidden="true" />
-        <p className="mt-2 font-mono text-[0.625rem] tracking-wide text-paper-dim/60 uppercase">
+        <p className="mt-2 text-[0.625rem] text-paper-dim/60">
           Audio · Image · Text
         </p>
       </div>
@@ -203,7 +202,7 @@ const HSL_LEDGER = [
 function HuskySatEntry({ entry, prefersReducedMotion }: { entry: ExperienceEntry; prefersReducedMotion: boolean }) {
   return (
     <motion.div
-      className="grid grid-cols-1 gap-x-8 gap-y-10 border-t border-ink-800 pt-16 lg:col-span-12 lg:grid-cols-12"
+      className="grid grid-cols-1 gap-x-8 gap-y-10 border-b border-ink-800 pb-16 lg:col-span-12 lg:grid-cols-12"
       initial={prefersReducedMotion ? undefined : { opacity: 0, y: 32 }}
       whileInView={prefersReducedMotion ? undefined : { opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-100px' }}
@@ -211,12 +210,12 @@ function HuskySatEntry({ entry, prefersReducedMotion }: { entry: ExperienceEntry
     >
       <div className="lg:col-span-5">
         <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
-          <span className="font-mono text-xs tracking-wide text-paper-dim tabular uppercase">{entry.dates}</span>
+          <span className="text-xs text-paper-dim tabular">{entry.dates}</span>
           {entry.stat && (
-            <span className="font-mono text-[0.625rem] tracking-[0.14em] text-accent uppercase">{entry.stat}</span>
+            <span className="text-[0.625rem] text-accent">{entry.stat}</span>
           )}
         </div>
-        <h3 className="mt-2 font-display text-4xl leading-[0.95] font-bold uppercase tracking-tight text-paper sm:text-5xl">
+        <h3 className="mt-2 font-display text-4xl leading-[0.95] font-semibold tracking-tight text-paper sm:text-5xl">
           {entry.company}
         </h3>
         <p className="mt-2 text-sm font-medium text-accent">
@@ -227,8 +226,8 @@ function HuskySatEntry({ entry, prefersReducedMotion }: { entry: ExperienceEntry
         <div className="mt-8 grid grid-cols-3 gap-x-6 border-t border-ink-800 pt-6">
           {HSL_LEDGER.map((item) => (
             <div key={item.label}>
-              <p className="font-display text-3xl font-bold tabular text-paper">{item.value}</p>
-              <p className="font-mono text-[0.625rem] tracking-[0.1em] text-paper-dim uppercase">{item.label}</p>
+              <p className="font-display text-3xl font-semibold tabular text-paper">{item.value}</p>
+              <p className="text-[0.625rem] text-paper-dim">{item.label}</p>
             </div>
           ))}
         </div>
@@ -238,7 +237,7 @@ function HuskySatEntry({ entry, prefersReducedMotion }: { entry: ExperienceEntry
             href={entry.link}
             target="_blank"
             rel="noreferrer"
-            className="link-underline mt-6 inline-flex items-center gap-1.5 font-mono text-[0.6875rem] font-medium tracking-wide text-accent uppercase transition-colors hover:text-paper"
+            className="link-underline mt-6 inline-flex items-center gap-1.5 text-[0.6875rem] font-medium text-accent transition-colors hover:text-paper"
           >
             {entry.linkLabel ?? 'Visit'}
             <span aria-hidden="true" className="text-[0.625rem]">
@@ -269,17 +268,16 @@ export default function Experience() {
 
   return (
     <section id="experience" className="relative mx-auto max-w-6xl px-6 py-28 sm:px-8 lg:px-12">
-      <Eyebrow>Work</Eyebrow>
       <MaskReveal className="mt-2 w-fit">
-        <h2 className="font-display text-4xl font-bold uppercase tracking-tight text-paper sm:text-5xl">
+        <h2 className="font-display text-4xl font-semibold tracking-tight text-paper sm:text-5xl">
           Experience
         </h2>
       </MaskReveal>
 
       <div className="mt-16 grid grid-cols-1 gap-x-8 gap-y-16 lg:grid-cols-12">
+        <HuskySatEntry entry={huskySat} prefersReducedMotion={prefersReducedMotion} />
         <AlgoverseEntry entry={algoverse} prefersReducedMotion={prefersReducedMotion} />
         <HandshakeEntry entry={handshake} prefersReducedMotion={prefersReducedMotion} />
-        <HuskySatEntry entry={huskySat} prefersReducedMotion={prefersReducedMotion} />
       </div>
     </section>
   )

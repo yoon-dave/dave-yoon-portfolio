@@ -1,147 +1,67 @@
-import { useEffect, useState } from 'react'
-import { motion, useReducedMotion } from 'motion/react'
-import MathEnvironment from './MathEnvironment'
-
-// Hand-authored scatter for each letterform — not randomized, so the
-// assembly reads as designed (like cut letters being placed on a page)
-// rather than physics-random. x/y in px, r in degrees, delay in seconds.
-// Each letter also starts oversized, so the name reads as materializing
-// from illegible, too-large fragments rather than just sliding into
-// place — an unusual scale relationship, not just a position tween.
-const LINE_ONE = [
-  { char: 'D', x: -64, y: -46, r: -16, scale: 2.4, delay: 0.02 },
-  { char: 'A', x: 52, y: -60, r: 13, scale: 2.1, delay: 0.16 },
-  { char: 'V', x: -38, y: 54, r: 20, scale: 2.6, delay: 0.09 },
-  { char: 'E', x: 70, y: 34, r: -11, scale: 1.9, delay: 0.24 },
+const LINKS = [
+  { label: 'Email', href: 'mailto:dgyoon@cs.washington.edu' },
+  { label: 'GitHub', href: 'https://github.com/yoon-dave' },
+  { label: 'LinkedIn', href: 'https://www.linkedin.com/in/dgyoon/' },
 ]
 
-const LINE_TWO = [
-  { char: 'Y', x: -80, y: 22, r: 15, scale: 2.3, delay: 0.32 },
-  { char: 'O', x: 56, y: -36, r: -18, scale: 2, delay: 0.44 },
-  { char: 'O', x: -28, y: 62, r: 9, scale: 2.5, delay: 0.38 },
-  { char: 'N', x: 84, y: -18, r: -13, scale: 2.2, delay: 0.52 },
+const NOW = [
+  { what: 'Software engineer, star tracker team', where: 'Husky Satellite Lab' },
+  { what: 'Building Thyrd, a campus events app', where: 'thyrd-theta.vercel.app' },
+  { what: 'CS + Business minor, class of 2028', where: 'University of Washington' },
 ]
-
-type Letter = (typeof LINE_ONE)[number]
-
-function Letterline({
-  letters,
-  prefersReducedMotion,
-  hoverEnabled,
-  hoveredChar,
-  onHover,
-}: {
-  letters: Letter[]
-  prefersReducedMotion: boolean
-  hoverEnabled: boolean
-  hoveredChar: Letter | null
-  onHover: (letter: Letter | null) => void
-}) {
-  return (
-    <div className="flex">
-      {letters.map((l, i) => (
-        <motion.span
-          key={`${l.char}-${i}`}
-          className="inline-block"
-          onMouseEnter={() => hoverEnabled && onHover(l)}
-          onMouseLeave={() => hoverEnabled && onHover(null)}
-          initial={
-            prefersReducedMotion ? undefined : { x: l.x, y: l.y, rotate: l.r, scale: l.scale, opacity: 0 }
-          }
-          animate={{
-            x: 0,
-            y: 0,
-            rotate: 0,
-            scale: 1,
-            opacity: 1,
-            color: hoveredChar === l ? 'var(--color-accent)' : 'var(--color-paper)',
-          }}
-          transition={{
-            x: prefersReducedMotion ? { duration: 0 } : { type: 'spring', stiffness: 110, damping: 14, mass: 1, delay: l.delay },
-            y: prefersReducedMotion ? { duration: 0 } : { type: 'spring', stiffness: 110, damping: 14, mass: 1, delay: l.delay },
-            rotate: prefersReducedMotion ? { duration: 0 } : { type: 'spring', stiffness: 110, damping: 14, mass: 1, delay: l.delay },
-            scale: prefersReducedMotion ? { duration: 0 } : { type: 'spring', stiffness: 110, damping: 14, mass: 1, delay: l.delay },
-            opacity: prefersReducedMotion ? { duration: 0 } : { type: 'spring', stiffness: 110, damping: 14, mass: 1, delay: l.delay },
-            color: { duration: 0.2, ease: 'easeOut' },
-          }}
-        >
-          {l.char}
-        </motion.span>
-      ))}
-    </div>
-  )
-}
 
 export default function Hero() {
-  const [trackingEnabled, setTrackingEnabled] = useState(false)
-  const [hoveredChar, setHoveredChar] = useState<Letter | null>(null)
-  const prefersReducedMotion = useReducedMotion()
-
-  useEffect(() => {
-    const fine = window.matchMedia('(pointer: fine)').matches
-    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    setTrackingEnabled(fine && !reduceMotion)
-  }, [])
-
   return (
-    <section
-      id="home"
-      onMouseLeave={() => setHoveredChar(null)}
-      className="relative mx-auto flex min-h-[92svh] w-full max-w-6xl flex-col justify-center px-6 py-28 sm:px-8 lg:px-12"
-    >
-      <MathEnvironment active={trackingEnabled} prefersReducedMotion={Boolean(prefersReducedMotion)} />
+    <section id="home" className="mx-auto w-full max-w-6xl px-6 pt-24 pb-16 sm:px-8 sm:pt-32 lg:px-12">
+      <div className="max-w-2xl">
+        <h1 className="font-display text-5xl leading-[1.05] font-semibold tracking-tight text-paper sm:text-6xl">
+          Hi, I’m Dave.
+        </h1>
 
-      <div className="relative z-10 flex flex-col">
-        <div className="w-fit">
-          <h1 className="font-display text-[clamp(3.5rem,13vw,8.5rem)] leading-[0.85] font-extrabold uppercase tracking-tight">
-            <Letterline
-              letters={LINE_ONE}
-              prefersReducedMotion={Boolean(prefersReducedMotion)}
-              hoverEnabled={trackingEnabled}
-              hoveredChar={hoveredChar}
-              onHover={setHoveredChar}
-            />
-            <Letterline
-              letters={LINE_TWO}
-              prefersReducedMotion={Boolean(prefersReducedMotion)}
-              hoverEnabled={trackingEnabled}
-              hoveredChar={hoveredChar}
-              onHover={setHoveredChar}
-            />
-          </h1>
+        <div className="mt-8 space-y-5 text-lg leading-relaxed text-paper-dim">
+          <p>I’m a computer science student at UW’s Allen School.</p>
+          <p>
+            Right now I’m writing <span className="marker text-paper">star-tracking software for CubeSats</span> at
+            Husky Satellite Lab and building
+            Thyrd, an app for finding things to do around campus and people to do them with. Before that, I
+            shipped an iOS app that’s reached 950+ users and co-authored a paper on catching phishing websites
+            with LLMs.
+          </p>
         </div>
 
-        <div className="animate-hero-in mt-7 flex items-center gap-3" style={{ animationDelay: '620ms' }}>
-          <span aria-hidden="true" className="h-1.5 w-1.5 bg-accent" />
-          <span className="font-mono text-[0.6875rem] tracking-[0.16em] text-paper-dim uppercase">
-            Computer Science — University of Washington
-          </span>
-        </div>
+        <ul className="mt-10 divide-y divide-ink-800 border-y border-ink-800">
+          {NOW.map((item) => (
+            <li key={item.what} className="flex flex-col gap-0.5 py-3 sm:flex-row sm:items-baseline sm:justify-between">
+              <span className="text-paper">{item.what}</span>
+              <span className="text-sm text-paper-dim">{item.where}</span>
+            </li>
+          ))}
+        </ul>
 
-        <p
-          className="animate-hero-in mt-6 max-w-xl text-lg leading-relaxed text-paper-dim"
-          style={{ animationDelay: '720ms' }}
-        >
-          CS student at the University of Washington. I ship across the
-          stack: AI research tooling, iOS apps, and full-stack products.
-        </p>
-
-        <div className="animate-hero-in mt-9 flex flex-wrap gap-4" style={{ animationDelay: '820ms' }}>
+        <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
           <a
             href="#projects"
-            className="group inline-flex items-center gap-2 rounded-[3px] bg-paper px-6 py-3 font-mono text-xs font-medium tracking-[0.08em] text-ink-950 uppercase transition-colors duration-200 hover:bg-accent"
+            onClick={(e) => {
+              // Glide down instead of jumping, even where CSS smooth scrolling is off.
+              e.preventDefault()
+              document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+              history.replaceState(null, '', '#projects')
+            }}
+            className="rounded-md bg-paper px-4 py-2 text-sm font-medium text-ink-950 transition-colors hover:bg-accent"
           >
-            View projects
-            <span aria-hidden="true" className="transition-transform duration-200 group-hover:translate-x-0.5">
-              →
-            </span>
+            See my projects
           </a>
-          <a
-            href="#contact"
-            className="group inline-flex items-center gap-2 rounded-[3px] border border-ink-700 px-6 py-3 font-mono text-xs font-medium tracking-[0.08em] text-paper uppercase transition-colors duration-200 hover:border-accent hover:text-accent"
-          >
-            Get in touch
-          </a>
+          {LINKS.map((link) => (
+            <a
+              key={link.label}
+              href={link.href}
+              target={link.href.startsWith('http') ? '_blank' : undefined}
+              rel="noreferrer"
+              className="text-sm font-medium text-accent underline decoration-accent/30 underline-offset-4 transition-colors hover:decoration-accent"
+            >
+              {link.label}
+            </a>
+          ))}
         </div>
       </div>
     </section>

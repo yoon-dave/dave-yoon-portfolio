@@ -1,29 +1,6 @@
-import { useRef, type ReactNode } from 'react'
-import { motion, useScroll, useSpring, useTransform, useReducedMotion } from 'motion/react'
+import type { ReactNode } from 'react'
 
-// An expanding circle, scroll-linked, opening from the small accent mark
-// near the top-left corner — the same recurring signature dot used as
-// every section's eyebrow, now the literal origin of a reveal. Used to
-// bookend Projects: the exhibit opens from that point, and Contact closes
-// the page by opening from the same point again.
+// Used to be a scroll-linked wipe. Headings now just sit on the page.
 export default function CircleReveal({ children, className = '' }: { children: ReactNode; className?: string }) {
-  const ref = useRef<HTMLDivElement>(null)
-  const prefersReducedMotion = useReducedMotion()
-  const { scrollYProgress } = useScroll({ target: ref, offset: ['start 0.95', 'start 0.5'] })
-  const smoothProgress = useSpring(scrollYProgress, { stiffness: 220, damping: 36, restDelta: 0.001 })
-  const clipPath = useTransform(smoothProgress, (v) => `circle(${v * 142}% at 1.5% 3%)`)
-
-  if (prefersReducedMotion) {
-    return (
-      <div ref={ref} className={className}>
-        {children}
-      </div>
-    )
-  }
-
-  return (
-    <motion.div ref={ref} className={className} style={{ clipPath }}>
-      {children}
-    </motion.div>
-  )
+  return <div className={className}>{children}</div>
 }

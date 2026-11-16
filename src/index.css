@@ -1,19 +1,22 @@
 @import "tailwindcss";
 
 @theme {
-  --font-display: 'Big Shoulders Display', 'Arial Narrow', sans-serif;
-  --font-sans: 'IBM Plex Sans', system-ui, 'Segoe UI', Roboto, sans-serif;
-  --font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', monospace;
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-sans: 'Inter', system-ui, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: ui-monospace, 'SFMono-Regular', monospace;
 
-  --color-ink-950: #0f141b;
-  --color-ink-900: #171f28;
-  --color-ink-800: #212b36;
-  --color-ink-700: #2d3947;
-  --color-ink-600: #47566a;
-  --color-paper: #ece8e0;
-  --color-paper-dim: #8f99a6;
-  --color-accent: #7fa9cc;
-  --color-accent-dim: #2e4c63;
+  /* Light "notebook" palette. The token names are left over from the old
+     dark theme: ink-* are now the paper tones and paper is now the ink. */
+  --color-ink-950: #fbf8f3;
+  --color-ink-900: #f4efe6;
+  --color-ink-800: #e7e0d3;
+  --color-ink-700: #d5cbb9;
+  --color-ink-600: #b0a48e;
+  --color-paper: #23201c;
+  --color-paper-dim: #6b645a;
+  --color-accent: #1f3a68;
+  --color-accent-dim: #e2e8f2;
+  --color-marker: #ffe58a;
 }
 
 html {
@@ -28,12 +31,11 @@ html {
 
 body {
   @apply bg-ink-950 font-sans text-paper;
-  font-feature-settings: 'tnum' 1;
 }
 
 ::selection {
-  background: rgba(127, 169, 204, 0.35);
-  color: #fff;
+  background: var(--color-marker);
+  color: var(--color-paper);
 }
 
 :focus-visible {
@@ -42,11 +44,15 @@ body {
 }
 
 .eyebrow {
-  font-family: var(--font-mono);
-  font-size: 0.6875rem;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
+  font-size: 0.8125rem;
+  font-weight: 500;
   color: var(--color-paper-dim);
+}
+
+/* Highlighter pen, for the one or two phrases worth skimming for. */
+.marker {
+  background-image: linear-gradient(transparent 55%, var(--color-marker) 55%, var(--color-marker) 90%, transparent 90%);
+  padding: 0 0.1em;
 }
 
 .tabular {
@@ -56,11 +62,9 @@ body {
 @keyframes rise-in {
   from {
     opacity: 0;
-    transform: translateY(14px);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
   }
 }
 

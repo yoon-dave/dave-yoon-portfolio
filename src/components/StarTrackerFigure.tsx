@@ -37,7 +37,7 @@ const DEC_MAX = 22
 const DEC_SPAN = 46
 const FOV = 160 // px, about 15.5 degrees
 const MATCH_LIMIT = 4 // brightest catalog stars used for the match
-const MIN_MATCHES = 3 // fewer than this and there's no attitude to report
+const MIN_MATCHES = 3 // fewer than this and there’s no attitude to report
 
 const toX = (ra: number) => ((RA_MAX - ra) / RA_SPAN) * W
 const toY = (dec: number) => ((DEC_MAX - dec) / DEC_SPAN) * H
@@ -86,7 +86,7 @@ function formatDec(dec: number) {
 
 export default function StarTrackerFigure() {
   const svgRef = useRef<SVGSVGElement>(null)
-  // Start the frame on Orion's belt so the first view is a clean solve.
+  // Start the frame on Orion’s belt so the first view is a clean solve.
   const [center, setCenter] = useState({ x: toX(84.05), y: toY(-1.2) })
 
   const half = FOV / 2
@@ -141,12 +141,12 @@ export default function StarTrackerFigure() {
   }
 
   return (
-    <div className="w-full border border-ink-700 bg-ink-900 shadow-[6px_6px_0_0_var(--color-ink-800)]">
+    <div className="artifact-frame w-full overflow-hidden rounded-lg border border-ink-700 bg-ink-950">
       <div className="flex flex-wrap items-baseline justify-between gap-2 border-b border-ink-800 px-5 py-3">
-        <span className="font-mono text-[0.625rem] tracking-[0.14em] text-paper-dim uppercase">
+        <span className="text-[0.625rem] text-paper-dim">
           Interactive · Lost-in-space solve
         </span>
-        <span className="font-mono text-[0.5625rem] tracking-[0.12em] text-paper-dim/60 uppercase">
+        <span className="text-[0.5625rem] text-paper-dim/60">
           Move the frame across the sky
         </span>
       </div>
@@ -154,7 +154,7 @@ export default function StarTrackerFigure() {
       <svg
         ref={svgRef}
         viewBox={`0 0 ${W} ${H}`}
-        className="block h-auto w-full cursor-crosshair bg-ink-950 select-none"
+        className="block h-auto w-full cursor-crosshair bg-ink-900/60 select-none focus:outline-none focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-accent"
         role="img"
         aria-label="Star field of Orion and nearby stars. A camera frame can be moved with the mouse, by tapping, or with the arrow keys; stars inside it are matched against a catalog to solve for pointing direction."
         tabIndex={0}
@@ -234,7 +234,7 @@ export default function StarTrackerFigure() {
               <text
                 x={s.x + radius(s.mag) + 8}
                 y={labelY.get(s.name)}
-                className="font-mono"
+                className="font-sans"
                 fontSize={10}
                 letterSpacing="0.08em"
                 fill="var(--color-accent)"
@@ -276,11 +276,11 @@ function Stage({
 }) {
   return (
     <div className="border-ink-800 px-5 py-3 sm:py-4 not-last:border-b sm:not-last:border-r sm:not-last:border-b-0">
-      <span className="font-mono text-[0.5625rem] tracking-[0.12em] text-paper-dim/60 uppercase">
+      <span className="text-[0.5625rem] text-paper-dim/60">
         {index} · {label}
       </span>
-      <p className={`mt-1 font-mono text-sm tabular ${active ? 'text-accent' : 'text-paper-dim'}`}>{value}</p>
-      {note && <p className="mt-0.5 font-mono text-[0.5625rem] text-paper-dim/60 uppercase">{note}</p>}
+      <p className={`mt-1 text-sm tabular ${active ? 'text-accent' : 'text-paper-dim'}`}>{value}</p>
+      {note && <p className="mt-0.5 text-[0.5625rem] text-paper-dim/60">{note}</p>}
     </div>
   )
 }

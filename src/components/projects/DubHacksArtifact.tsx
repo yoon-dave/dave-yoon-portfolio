@@ -11,7 +11,7 @@ const STAGES = [
 export default function DubHacksArtifact() {
   return (
     <div className="artifact-frame w-full max-w-md border border-ink-700 bg-ink-900 p-5 shadow-[6px_6px_0_0_var(--color-ink-800)]">
-      <span className="font-mono text-[0.625rem] tracking-[0.14em] text-paper-dim uppercase">
+      <span className="text-[0.625rem] text-paper-dim">
         System diagram · T-Mobile 5G Home Internet gateway
       </span>
       <div className="mt-4 flex flex-col">
@@ -23,10 +23,10 @@ export default function DubHacksArtifact() {
               }`}
             >
               <p className={`text-sm font-medium ${i === 2 ? 'text-accent' : 'text-paper'}`}>{s.label}</p>
-              <p className="font-mono text-[0.5625rem] text-paper-dim/60 uppercase">{s.detail}</p>
+              <p className="text-[0.5625rem] text-paper-dim/60">{s.detail}</p>
             </div>
             {i < STAGES.length - 1 && (
-              <div aria-hidden="true" className="flex justify-center py-1 font-mono text-paper-dim/40">
+              <div aria-hidden="true" className="flex justify-center py-1 text-paper-dim/40">
                 ↓
               </div>
             )}

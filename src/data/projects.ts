@@ -50,7 +50,7 @@ export const projects: Project[] = [
     description:
       'An iOS fitness app I designed, developed, and shipped independently to the App Store, using Swift, SwiftUI, and MVVM. The UI is state-driven with Combine, supporting drag-and-drop reordering and full CRUD over exercises within workout splits. A Codable/JSON persistence layer tracks calendar-aware progress, and Swift Charts visualize performance history.',
     tags: ['Swift', 'SwiftUI', 'Combine', 'MVVM'],
-    statNumber: 943,
+    statNumber: 950,
     statSuffix: '+ Users',
     link: 'https://apps.apple.com/us/app/gymbud-fitness-tracker/id6751370702',
     linkLabel: 'App Store',
@@ -59,7 +59,7 @@ export const projects: Project[] = [
     title: 'T-Mobile AI Pricing Assistant',
     code: 'DubHacks 2025 · 3rd Place, Category Winner',
     description:
-      "Built the Python backend for a 4-person, interdisciplinary team at DubHacks, a 24-hour collegiate hackathon. Integrated Gemini 1.5 Pro for real-time pricing and inventory reasoning over live sales data, and deployed the working prototype on a Raspberry Pi 5 modeling T-Mobile's 5G Home Internet gateway.",
+      "Built the Python backend for a 4-person, interdisciplinary team at DubHacks, a 24-hour collegiate hackathon. Integrated Gemini 1.5 Pro for real-time pricing and inventory reasoning over live sales data, and deployed the working prototype on a Raspberry Pi 5 modeling T-Mobile’s 5G Home Internet gateway.",
     tags: ['Python', 'Gemini 1.5 Pro', 'Raspberry Pi'],
     stat: '3rd Place',
   },
